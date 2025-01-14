@@ -3,7 +3,7 @@ import searchIcon from "../../assets/search_icon.png";
 
 const NavBar = () => {
   return (
-    <div className="w-full bg-[#f5f7f9] flex flex-col">
+    <div className="w-full bg-[#f5f7f9] border-b-[1px] border-gray-200">
       {/* Header */}
       <div className="flex flex-col p-5 gap-3 sm:flex-row sm:items-center sm:justify-between">
         {/* icon & application name*/}
@@ -11,8 +11,8 @@ const NavBar = () => {
           <div className="flex items-center gap-3">
             <div className="w-10 sm:w-12 lg:w-14 ">
               <img
-                src="https://i.pinimg.com/736x/c0/98/11/c09811f91b1b1dae29e16cc782aaf48a.jpg "
-                className="object-cover rounded-lg border-[1px] border-gray-300"
+                src="https://dcdws.blob.core.windows.net/dws-2225908-7182-media/sites/7182/2023/02/warranty-icon-sign-free-png-1.png"
+                className="object-cover rounded-full bg-yellow-400 p-1"
               />
             </div>
             <div className="flex flex-col text-gray-800 font-bold text-lg sm:text-xl lg:text-2xl">
@@ -38,15 +38,6 @@ const NavBar = () => {
               +
             </button>
           </Link>
-        </div>
-      </div>
-
-      {/* Sub-header */}
-      <div className="w-full bg-[#d9d9d9]">
-        <div className="flex items-center py-1 px-5 gap-5 text-gray-800 sm:gap-10 lg:gap-15">
-          <p className="px-2 py-1 rounded-md duration-300 hover:bg-gray-100 cursor-pointer">all</p>
-          <p className="px-2 py-1 rounded-md hover:bg-gray-100 cursor-pointer">warranty</p>
-          <p className="px-2 py-1 rounded-md hover:bg-gray-100 cursor-pointer">expired</p>
         </div>
       </div>
     </div>

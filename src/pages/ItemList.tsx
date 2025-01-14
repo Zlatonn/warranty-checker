@@ -1,4 +1,25 @@
+import Item from "../components/Item";
+
 const ItemList = () => {
-  return <div>ItemList</div>;
+  return (
+    <div className="flex flex-col">
+      <div className="flex justify-end gap-3">
+        <p>Show :</p>
+        <select className="text-gray-400 text-center">
+          <option value="all">all</option>
+          <option value="warranty">warranty</option>
+          <option value="expired">expired</option>
+        </select>
+      </div>
+      <div className=" mt-10 grid grid-cols-1 lg:grid-cols-2 2xl:grid-cols-3 gap-8">
+        <Item />
+        <Item />
+        <Item />
+        <Item />
+        <Item />
+        <Item />
+      </div>
+    </div>
+  );
 };
 export default ItemList;
