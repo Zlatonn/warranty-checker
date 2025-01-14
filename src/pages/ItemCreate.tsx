@@ -7,7 +7,7 @@ const ItemCreate = () => {
         <h1 className="text-2xl font-bold text-gray-800">Create new item</h1>
         <p className="text-gray-500">Lorem ipsum dolor sit amet consectetur adipisicing elit. Quibusdam, pariatur?</p>
       </div>
-      <div className="flex flex-col gap-8">
+      <div className="flex flex-col gap-8 text-gray-500">
         <div className="flex flex-col gap-1">
           <p className="font-semibold text-gray-800">Item name : </p>
           <input type="text" placeholder="type item name..." className="border-[1px] outline-none rounded-lg px-2 py-1" />

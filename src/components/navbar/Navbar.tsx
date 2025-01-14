@@ -33,7 +33,9 @@ const NavBar = () => {
             </button>
           </div>
           <Link to="/create">
-            <button className="h-10 px-4  inline-flex justify-center items-center bg-blue-500 text-white rounded-xl">+</button>
+            <button className="h-10 px-4  inline-flex justify-center items-center bg-blue-500 text-white rounded-xl hover:rotate-180 hover:bg-blue-700 duration-500">
+              +
+            </button>
           </Link>
         </div>
       </div>
