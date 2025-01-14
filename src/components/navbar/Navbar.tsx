@@ -16,8 +16,7 @@ const NavBar = () => {
               />
             </div>
             <div className="flex flex-col text-gray-800 font-bold text-lg sm:text-xl lg:text-2xl">
-              <p>warranty</p>
-              <p>checker</p>
+              <p>warranty checker</p>
             </div>
           </div>
         </Link>
@@ -34,9 +33,7 @@ const NavBar = () => {
             </button>
           </div>
           <Link to="/create">
-            <button className="h-10 px-4  inline-flex justify-center items-center bg-blue-500 duration-300 hover:bg-blue-300 text-white rounded-xl">
-              +
-            </button>
+            <button className="h-10 px-4  inline-flex justify-center items-center bg-blue-500 text-white rounded-xl">+</button>
           </Link>
         </div>
       </div>

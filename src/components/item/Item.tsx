@@ -1,4 +1,4 @@
-import deleteBtn from "../assets/delete.png";
+import deleteBtn from "../../assets/delete.png";
 const Item = () => {
   return (
     <div className="flex justify-between p-3 border-2 bg-[#f5f7f9] rounded-xl cursor-pointer hover:shadow-lg duration-300">

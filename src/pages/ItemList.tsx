@@ -1,10 +1,10 @@
-import Item from "../components/Item";
+import Item from "../components/item/Item";
 
 const ItemList = () => {
   return (
     <div className="flex flex-col">
       <div className="flex justify-end gap-3">
-        <p>Show :</p>
+        <p className="text-gray-800">Show :</p>
         <select className="text-gray-400 text-center">
           <option value="all">all</option>
           <option value="warranty">warranty</option>
