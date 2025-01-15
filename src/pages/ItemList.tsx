@@ -2,8 +2,10 @@ import { useEffect, useState } from "react";
 import Item from "../components/item/Item";
 import axios from "axios";
 
+// define base api URL
 const BASE_URL: string = "http://localhost:8000";
 
+// define type items
 interface Iitems {
   id: number;
   itemName: string;
@@ -12,6 +14,7 @@ interface Iitems {
   endDate: string;
   notes: string;
 }
+
 const ItemList = () => {
   const [items, setItems] = useState<Iitems[]>([]);
 
