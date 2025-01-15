@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 import Item from "../components/item/Item";
+import axios from "axios";
 
 const BASE_URL: string = "http://localhost:8000";
 
@@ -14,12 +15,11 @@ interface Iitems {
 const ItemList = () => {
   const [items, setItems] = useState<Iitems[]>([]);
 
-  // function fetchItem
+  // function fetchItem with axios
   const fetchItem = async () => {
     try {
-      const response = await fetch(`${BASE_URL}/items`);
-      const data = await response.json();
-      setItems(data);
+      const response = await axios.get(`${BASE_URL}/items`);
+      setItems(response.data);
     } catch (error) {
       console.error("Error fetching items:", error);
     }
