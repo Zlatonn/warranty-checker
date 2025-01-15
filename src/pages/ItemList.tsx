@@ -5,7 +5,7 @@ const ItemList = () => {
     <div className="flex flex-col">
       <div className="flex justify-end gap-3">
         <p className="text-gray-800">Show :</p>
-        <select className="text-gray-400 text-center">
+        <select className="text-gray-400 text-center outline-none">
           <option value="all">all</option>
           <option value="warranty">warranty</option>
           <option value="expired">expired</option>

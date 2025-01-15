@@ -10,24 +10,41 @@ const ItemDetail = () => {
       </div>
       <div className="flex flex-col gap-8 text-gray-500">
         <div className="flex flex-col gap-1">
-          <p className="font-semibold text-gray-800">Item name : </p>
-          <input type="text" placeholder="type item name..." className="border-[1px] outline-none rounded-lg px-2 py-1" />
+          <p className="font-semibold text-gray-800">Item name</p>
+          <input
+            type="text"
+            placeholder="type item name..."
+            className="w-full px-2 py-1 rounded-lg border-[1px] focus:outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500"
+          />
         </div>
         <div className="flex flex-col gap-1">
-          <p className="font-semibold text-gray-800">Serial number : </p>
-          <input type="text" placeholder="type serial number..." className="border-[1px] outline-none rounded-lg px-2 py-1" />
+          <p className="font-semibold text-gray-800">Serial number </p>
+          <input
+            type="text"
+            placeholder="type serial number..."
+            className="w-full px-2 py-1 rounded-lg border-[1px] focus:outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500"
+          />
         </div>
         <div className="flex flex-col gap-1">
-          <p className="font-semibold text-gray-800">Warranty start date : </p>
-          <input type="date" className="border-[1px] outline-none rounded-lg px-2 py-1" />
+          <p className="font-semibold text-gray-800">Warranty start date</p>
+          <input
+            type="date"
+            className="w-full px-2 py-1 rounded-lg border-[1px] focus:outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500"
+          />
         </div>
         <div className="flex flex-col gap-1">
-          <p className="font-semibold text-gray-800">Warranty end date : </p>
-          <input type="date" className="border-[1px] outline-none rounded-lg px-2 py-1" />
+          <p className="font-semibold text-gray-800">Warranty end date</p>
+          <input
+            type="date"
+            className="w-full px-2 py-1 rounded-lg border-[1px] focus:outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500"
+          />
         </div>
         <div className="flex flex-col gap-1">
-          <p className="font-semibold text-gray-800">notes : </p>
-          <textarea placeholder="type notes..." className="border-[1px] outline-none rounded-lg px-2 py-1" />
+          <p className="font-semibold text-gray-800">notes</p>
+          <textarea
+            placeholder="type notes..."
+            className="w-full px-2 py-1 rounded-lg border-[1px] focus:outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500"
+          />
         </div>
       </div>
       <div className="flex justify-end gap-3">
