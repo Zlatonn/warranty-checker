@@ -19,6 +19,7 @@ app.use(cors());
 
 // define type items
 interface Iitems {
+  id: number;
   itemName: string;
   serialNumber: string;
   startDate: string;
@@ -133,13 +134,20 @@ app.get("/items", (req: Request, res: Response) => {
 });
 
 /** path get specific item */
+app.get("/item/:id", (req: Request, res: Response) => {
+  // get id from params
+  const getId: number = parseInt(req.params.id);
+  // find item by id
+  const item = items.find((item) => item.id === getId);
+  res.json(item);
+});
 
 /** path create item */
 app.post("/create", (req: Request, res: Response) => {
   // get data from body
   const body = req.body;
 
-  // Align pattern data
+  // manage pattern data
   const newItem = {
     id: id,
     itemName: body.itemName,
