@@ -3,7 +3,7 @@ import { Link } from "react-router-dom";
 const Item = () => {
   return (
     <Link to="/detail">
-      <div className="flex justify-between p-3 border-[1px] bg-[#f5f7f9] rounded-xl cursor-pointer hover:shadow-lg duration-300">
+      <div className="flex justify-between p-3 border-[1px] bg-[#fff] rounded-xl cursor-pointer hover:shadow-lg duration-300">
         {/* Left content */}
         <div className="flex flex-col justify-between gap-2 sm:gap-3">
           <p className="text-sm text-gray-700">serial: XXXXXXXXXX</p>
