@@ -11,7 +11,7 @@ const ItemList = () => {
           <option value="expired">expired</option>
         </select>
       </div>
-      <div className=" mt-10 grid grid-cols-1 lg:grid-cols-2 2xl:grid-cols-3 gap-8">
+      <div className=" mt-10 grid grid-cols-1 lg:grid-cols-2 2xl:grid-cols-3 gap-6">
         <Item />
         <Item />
         <Item />
