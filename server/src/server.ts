@@ -130,6 +130,7 @@ let id: number = 1;
 
 /** path get all items */
 app.get("/items", (req: Request, res: Response) => {
+  // return all items
   res.json(items);
 });
 
@@ -137,9 +138,12 @@ app.get("/items", (req: Request, res: Response) => {
 app.get("/item/:id", (req: Request, res: Response) => {
   // get id from params
   const getId: number = parseInt(req.params.id);
+
   // find item by id
-  const item = items.find((item) => item.id === getId);
-  res.json(item);
+  const getItem = items.find((item) => item.id === getId);
+
+  // return specfic item
+  res.json(getItem);
 });
 
 /** path create item */
@@ -162,12 +166,33 @@ app.post("/create", (req: Request, res: Response) => {
 
   // increment id
   id += 1;
-  res.send(newItem);
+
+  // response command
+  res.send({
+    status: "create complete",
+    newItem: newItem,
+  });
 });
 
 /** path update item */
 
 /** path delete item */
+app.delete("/item/:id", (req: Request, res: Response) => {
+  // get id from params
+  const getId: number = parseInt(req.params.id);
+
+  // find delete index
+  const deleteIndex = items.findIndex((item) => item.id === getId);
+
+  // delete item
+  items.splice(deleteIndex, 1);
+
+  // response command
+  res.json({
+    staus: "delete complete",
+    deleteIndex: deleteIndex,
+  });
+});
 
 // Start the server
 app.listen(PORT, () => {
