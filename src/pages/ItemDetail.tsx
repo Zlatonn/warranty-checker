@@ -2,13 +2,13 @@ import { Link } from "react-router-dom";
 
 const ItemDetail = () => {
   return (
-    <div className="py-5 flex flex-col gap-10 lg:px-40">
+    <div className="py-5 flex flex-col gap-5 lg:px-40">
       <div className="flex flex-col gap-5">
         <h1 className="text-2xl font-bold text-gray-800">Edit item</h1>
         <p className="text-gray-500 text-sm lg:text-md">Lorem ipsum dolor sit amet consectetur adipisicing elit. Quibusdam, pariatur?</p>
         <hr />
       </div>
-      <div className="flex flex-col gap-5 text-gray-500">
+      <div className="flex flex-col gap-8 text-gray-500">
         <div className="flex flex-col gap-1">
           <p className="font-semibold text-gray-800">Item name : </p>
           <input type="text" placeholder="type item name..." className="border-[1px] outline-none rounded-lg px-2 py-1" />
