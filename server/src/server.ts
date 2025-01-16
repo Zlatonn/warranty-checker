@@ -27,199 +27,193 @@ interface Iitems {
   notes: string;
 }
 
+// store item list
 const items: Iitems[] = [];
-let id: number = 1;
-// const items: Iitems[] = [
-//   {
-//     id: 1,
-//     itemName: "mouse",
-//     serialNumber: "xxx-xxx-xx1",
-//     startDate: "2024-01-01",
-//     endDate: "2025-01-01",
-//     notes: "Wireless mouse",
-//   },
-//   {
-//     id: 2,
-//     itemName: "keyboard",
-//     serialNumber: "xxx-xxx-xx2",
-//     startDate: "2023-06-15",
-//     endDate: "2024-06-15",
-//     notes: "Mechanical keyboard with RGB",
-//   },
-//   {
-//     id: 3,
-//     itemName: "monitor",
-//     serialNumber: "xxx-xxx-xx3",
-//     startDate: "2022-11-01",
-//     endDate: "2025-11-01",
-//     notes: "Curved 27-inch monitor",
-//   },
-//   {
-//     id: 4,
-//     itemName: "headphones",
-//     serialNumber: "xxx-xxx-xx4",
-//     startDate: "2023-07-10",
-//     endDate: "2024-07-10",
-//     notes: "Noise-canceling over-ear headphones",
-//   },
-//   {
-//     id: 5,
-//     itemName: "laptop",
-//     serialNumber: "xxx-xxx-xx5",
-//     startDate: "2024-01-10",
-//     endDate: "2025-01-10",
-//     notes: "Gaming laptop with high refresh rate",
-//   },
-//   {
-//     id: 6,
-//     itemName: "printer",
-//     serialNumber: "xxx-xxx-xx6",
-//     startDate: "2021-04-05",
-//     endDate: "2024-04-05",
-//     notes: "All-in-one color printer",
-//   },
-//   {
-//     id: 7,
-//     itemName: "router",
-//     serialNumber: "xxx-xxx-xx7",
-//     startDate: "2023-09-20",
-//     endDate: "2024-09-20",
-//     notes: "Wi-Fi 6 router",
-//   },
-//   {
-//     id: 8,
-//     itemName: "external hard drive",
-//     serialNumber: "xxx-xxx-xx8",
-//     startDate: "2023-02-25",
-//     endDate: "2025-02-25",
-//     notes: "1TB external hard drive",
-//   },
-//   {
-//     id: 9,
-//     itemName: "webcam",
-//     serialNumber: "xxx-xxx-xx9",
-//     startDate: "2023-12-01",
-//     endDate: "2025-12-01",
-//     notes: "HD webcam",
-//   },
-//   {
-//     id: 10,
-//     itemName: "tablet",
-//     serialNumber: "xxx-xxx-xx10",
-//     startDate: "2024-03-01",
-//     endDate: "2025-03-01",
-//     notes: "10-inch tablet for drawing",
-//   },
-//   {
-//     id: 11,
-//     itemName: "smartwatch",
-//     serialNumber: "xxx-xxx-xx11",
-//     startDate: "2024-05-01",
-//     endDate: "2025-05-01",
-//     notes: "Fitness smartwatch with heart rate monitor",
-//   },
-//   {
-//     id: 12,
-//     itemName: "digital camera",
-//     serialNumber: "xxx-xxx-xx12",
-//     startDate: "2023-08-15",
-//     endDate: "2024-08-15",
-//     notes: "Compact digital camera for photography",
-//   },
-// ];
 
-/** path get all items */
+// define id
+let id: number = 1;
+
+// function valid form
+const validForm = (body: Iitems): string[] => {
+  const errors = [];
+  if (!body.itemName) {
+    errors.push("itemName is required");
+  }
+  if (!body.serialNumber) {
+    errors.push("serialNumber is required");
+  }
+  if (!body.startDate) {
+    errors.push("startDate is required");
+  }
+  if (!body.endDate) {
+    errors.push("endDate is required");
+  }
+  if (!body.notes) {
+    errors.push("notes is required");
+  }
+  return errors;
+};
+
+/** ----- PATH => get all items ----- */
 app.get("/items", (req: Request, res: Response) => {
   // return all items
   res.json(items);
 });
 
-/** path get specific item */
+/** ----- PATH => get specific item ----- */
 app.get("/item/:id", (req: Request, res: Response) => {
-  // get id from params
-  const getId: number = parseInt(req.params.id);
+  try {
+    // get id from params
+    const getId: number = parseInt(req.params.id);
 
-  // find item by id
-  const getItem = items.find((item) => item.id === getId);
+    // check if id is a valid number
+    if (isNaN(getId)) {
+      res.status(400).json({ error: "Invalid ID format" });
+      return;
+    }
 
-  // return specfic item
-  res.json(getItem);
-});
+    // find item by id
+    const getItem = items.find((item) => item.id === getId);
 
-/** path create item */
-app.post("/create", (req: Request, res: Response) => {
-  // get data from body
-  const body = req.body;
+    // check when item not found
+    if (!getItem) {
+      res.status(404).json({ error: `Item with ID:${getId} not found` });
+      return;
+    }
 
-  // manage pattern data
-  const newItem = {
-    id: id,
-    itemName: body.itemName,
-    serialNumber: body.serialNumber,
-    startDate: body.startDate,
-    endDate: body.endDate,
-    notes: body.notes,
-  };
-
-  // add new item
-  items.push(newItem);
-
-  // increment id
-  id += 1;
-
-  // response command
-  res.send({
-    message: "create complete",
-    newItem: newItem,
-  });
-});
-
-/** path update item */
-app.put("/item/:id", (req: Request, res: Response) => {
-  // get id from params
-  const getId: number = parseInt(req.params.id);
-
-  // get data from body
-  const body = req.body;
-
-  // find update index
-  const updateIndex = items.find((item) => item.id === getId);
-
-  if (updateIndex) {
-    // update item
-    updateIndex.itemName = body.itemName || updateIndex.itemName;
-    updateIndex.serialNumber = body.serialNumber || updateIndex.serialNumber;
-    updateIndex.startDate = body.startDate || updateIndex.startDate;
-    updateIndex.endDate = body.endDate || updateIndex.endDate;
-    updateIndex.notes = body.notes || updateIndex.notes;
-
-    // response command
-    res.json({
-      message: "update complete",
-      data: updateIndex,
-    });
+    // return specfic item
+    res.json(getItem);
+  } catch (error) {
+    console.error("Error:", error);
+    res.status(500).json({ error: "Internal server error" });
   }
 });
 
-/** path delete item */
+/** ----- PATH => create item ----- */
+app.post("/create", (req: Request, res: Response) => {
+  try {
+    // get data from body
+    const body = req.body;
+
+    //check valid body
+    const errors = validForm(body);
+    if (errors && errors.length > 0) {
+      res.status(422).json({ errors: errors });
+      return;
+    }
+
+    // manage pattern data
+    const newItem = {
+      id: id,
+      itemName: body.itemName,
+      serialNumber: body.serialNumber,
+      startDate: body.startDate,
+      endDate: body.endDate,
+      notes: body.notes,
+    };
+
+    // add new item
+    items.push(newItem);
+
+    // increment id
+    id += 1;
+
+    // response command
+    res.status(201).json({
+      message: "create complete",
+      newItem: newItem,
+    });
+  } catch (error) {
+    console.error("Error:", error);
+    res.status(500).json({ error: "Internal server error" });
+  }
+});
+
+/** ----- PATH => update item ----- */
+app.put("/item/:id", (req: Request, res: Response) => {
+  try {
+    // get id from params
+    const getId: number = parseInt(req.params.id);
+
+    // check if id is a valid number
+    if (isNaN(getId)) {
+      res.status(400).json({ error: "Invalid ID format" });
+      return;
+    }
+
+    // get data from body
+    const body = req.body;
+
+    //check valid body
+    const errors = validForm(body);
+    if (errors && errors.length > 0) {
+      res.status(422).json({ errors: errors });
+      return;
+    }
+
+    // find update item
+    const updateItem = items.find((item) => item.id === getId);
+
+    // check when item not found
+    if (!updateItem) {
+      res.status(404).json({ error: `Item with ID:${getId} not found` });
+      return;
+    }
+
+    // update item
+    updateItem.itemName = body.itemName;
+    updateItem.serialNumber = body.serialNumber;
+    updateItem.startDate = body.startDate;
+    updateItem.endDate = body.endDate;
+    updateItem.notes = body.notes;
+
+    // response command
+    res.status(201).json({
+      message: "update complete",
+      data: updateItem,
+    });
+  } catch (error) {
+    console.error("Error:", error);
+    res.status(500).json({ error: "Internal server error" });
+  }
+});
+
+/** ----- PATH => delete item ----- */
 app.delete("/item/:id", (req: Request, res: Response) => {
-  // get id from params
-  const getId: number = parseInt(req.params.id);
+  try {
+    // get id from params
+    const getId: number = parseInt(req.params.id);
 
-  // find delete index
-  const deleteIndex = items.findIndex((item) => item.id === getId);
+    // check if id is a valid number
+    if (isNaN(getId)) {
+      res.status(400).json({ error: "Invalid ID format" });
+      return;
+    }
 
-  // buffer delete data
-  const deleteData = items[deleteIndex];
+    // find delete index
+    const deleteIndex = items.findIndex((item) => item.id === getId);
 
-  // delete item
-  items.splice(deleteIndex, 1);
+    // check when item not found
+    if (deleteIndex === -1) {
+      res.status(404).json({ error: `Item with ID:${getId} not found` });
+      return;
+    }
 
-  // response command
-  res.json({
-    message: "delete complete",
-    data: deleteData,
-  });
+    // buffer delete data
+    const deleteData = items[deleteIndex];
+
+    // delete item
+    items.splice(deleteIndex, 1);
+
+    // response command
+    res.json({
+      message: "delete complete",
+      data: deleteData,
+    });
+  } catch (error) {
+    console.error("Error:", error);
+    res.status(500).json({ error: "Internal server error" });
+  }
 });
 
 // Start the server
