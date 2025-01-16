@@ -36,21 +36,11 @@ let id: number = 1;
 // function valid form
 const validForm = (body: Iitems): string[] => {
   const errors = [];
-  if (!body.itemName) {
-    errors.push("itemName is required");
-  }
-  if (!body.serialNumber) {
-    errors.push("serialNumber is required");
-  }
-  if (!body.startDate) {
-    errors.push("startDate is required");
-  }
-  if (!body.endDate) {
-    errors.push("endDate is required");
-  }
-  if (!body.notes) {
-    errors.push("notes is required");
-  }
+  if (!body.itemName) errors.push("itemName is required");
+  if (!body.serialNumber) errors.push("serialNumber is required");
+  if (!body.startDate) errors.push("startDate is required");
+  if (!body.endDate) errors.push("endDate is required");
+  if (!body.notes) errors.push("notes is required");
   return errors;
 };
 

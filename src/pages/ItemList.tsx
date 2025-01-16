@@ -3,7 +3,7 @@ import Item from "../components/item/Item";
 import axios from "axios";
 
 // define base api URL
-const BASE_URL: string = "http://localhost:8000";
+export const BASE_URL: string = "http://localhost:8000";
 
 // define type items
 interface Iitems {
@@ -17,7 +17,7 @@ interface Iitems {
 
 const ItemList = () => {
   const [items, setItems] = useState<Iitems[]>([]);
-
+  console.log(items);
   // function fetchItem with axios
   const fetchItem = async () => {
     try {
