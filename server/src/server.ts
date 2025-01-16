@@ -169,12 +169,37 @@ app.post("/create", (req: Request, res: Response) => {
 
   // response command
   res.send({
-    status: "create complete",
+    message: "create complete",
     newItem: newItem,
   });
 });
 
 /** path update item */
+app.put("/item/:id", (req: Request, res: Response) => {
+  // get id from params
+  const getId: number = parseInt(req.params.id);
+
+  // get data from body
+  const body = req.body;
+
+  // find update index
+  const updateIndex = items.find((item) => item.id === getId);
+
+  if (updateIndex) {
+    // update item
+    updateIndex.itemName = body.itemName || updateIndex.itemName;
+    updateIndex.serialNumber = body.serialNumber || updateIndex.serialNumber;
+    updateIndex.startDate = body.startDate || updateIndex.startDate;
+    updateIndex.endDate = body.endDate || updateIndex.endDate;
+    updateIndex.notes = body.notes || updateIndex.notes;
+
+    // response command
+    res.json({
+      message: "update complete",
+      data: updateIndex,
+    });
+  }
+});
 
 /** path delete item */
 app.delete("/item/:id", (req: Request, res: Response) => {
@@ -184,13 +209,16 @@ app.delete("/item/:id", (req: Request, res: Response) => {
   // find delete index
   const deleteIndex = items.findIndex((item) => item.id === getId);
 
+  // buffer delete data
+  const deleteData = items[deleteIndex];
+
   // delete item
   items.splice(deleteIndex, 1);
 
   // response command
   res.json({
-    staus: "delete complete",
-    deleteIndex: deleteIndex,
+    message: "delete complete",
+    data: deleteData,
   });
 });
 
