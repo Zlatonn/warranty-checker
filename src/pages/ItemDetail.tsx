@@ -26,13 +26,6 @@ const ItemDetail = () => {
           />
         </div>
         <div className="flex flex-col gap-1">
-          <p className="font-semibold text-gray-800">Warranty start date</p>
-          <input
-            type="date"
-            className="w-full px-2 py-1 rounded-lg border-[1px] focus:outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500"
-          />
-        </div>
-        <div className="flex flex-col gap-1">
           <p className="font-semibold text-gray-800">Warranty end date</p>
           <input
             type="date"

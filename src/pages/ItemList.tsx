@@ -10,14 +10,12 @@ interface Iitems {
   id: number;
   itemName: string;
   serialNumber: string;
-  startDate: string;
   endDate: string;
   notes: string;
 }
 
 const ItemList = () => {
   const [items, setItems] = useState<Iitems[]>([]);
-  console.log(items);
   // function fetchItem with axios
   const fetchItem = async () => {
     try {

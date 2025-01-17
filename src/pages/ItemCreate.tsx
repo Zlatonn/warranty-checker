@@ -6,11 +6,10 @@ import { BASE_URL } from "./ItemList";
 
 // define type form
 interface Iform {
-  itemName?: string;
-  serialNumber?: string;
-  startDate?: string;
-  endDate?: string;
-  notes?: string;
+  itemName: string;
+  serialNumber: string;
+  endDate: string;
+  notes: string;
 }
 
 // define type form errors
@@ -27,7 +26,6 @@ const ItemCreate = () => {
   const [formData, setFormData] = useState<Iform>({
     itemName: "",
     serialNumber: "",
-    startDate: "",
     endDate: "",
     notes: "",
   });
@@ -48,7 +46,6 @@ const ItemCreate = () => {
     const validErrors: IformErrors = {};
     if (!body.itemName) validErrors.itemName = "*** Item name is required ***";
     if (!body.serialNumber) validErrors.serialNumber = "*** Serial number is required ***";
-    if (!body.startDate) validErrors.startDate = "*** Warranty start date is required ***";
     if (!body.endDate) validErrors.endDate = "*** Warranty end date is required ***";
     if (!body.notes) validErrors.notes = "*** Notes is required ***";
     return validErrors;
@@ -63,7 +60,7 @@ const ItemCreate = () => {
       // prevent form refesh page
       e.preventDefault();
 
-      const invalid: Iform = validForm(formData);
+      const invalid: IformErrors = validForm(formData);
       setErrors(invalid);
 
       // check erros object is empty
@@ -107,17 +104,6 @@ const ItemCreate = () => {
             className="w-full px-2 py-1 rounded-lg border-[1px] focus:outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500"
           />
           {errors.serialNumber && <p className="w-fit mt-1 text-red-500 text-sm">{errors.serialNumber}</p>}
-        </div>
-        <div className="flex flex-col gap-1">
-          <p className="font-semibold text-gray-800">Warranty start date</p>
-          <input
-            type="date"
-            name="startDate"
-            value={formData.startDate}
-            onChange={handleInputChange}
-            className="w-full px-2 py-1 rounded-lg border-[1px] focus:outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500"
-          />
-          {errors.startDate && <p className="w-fit mt-1 text-red-500 text-sm">{errors.startDate}</p>}
         </div>
         <div className="flex flex-col gap-1">
           <p className="font-semibold text-gray-800">Warranty end date</p>

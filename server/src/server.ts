@@ -5,24 +5,17 @@ import cors from "cors";
 const app = express();
 const PORT = 8000;
 
+// use bodatParser for path post
 app.use(bodyParser.json());
 
 // use cors to allow all domain
 app.use(cors());
-
-// use cors to allow specfic domain
-// app.use(
-//   cors({
-//     origin: "http://localhost:5173", // อนุญาตให้โดเมนนี้เข้าถึง
-//   })
-// );
 
 // define type items
 interface Iitems {
   id: number;
   itemName: string;
   serialNumber: string;
-  startDate: string;
   endDate: string;
   notes: string;
 }
@@ -38,7 +31,6 @@ const validForm = (body: Iitems): string[] => {
   const errors = [];
   if (!body.itemName) errors.push("itemName is required");
   if (!body.serialNumber) errors.push("serialNumber is required");
-  if (!body.startDate) errors.push("startDate is required");
   if (!body.endDate) errors.push("endDate is required");
   if (!body.notes) errors.push("notes is required");
   return errors;
@@ -153,7 +145,6 @@ app.put("/item/:id", (req: Request, res: Response) => {
     // update item
     updateItem.itemName = body.itemName;
     updateItem.serialNumber = body.serialNumber;
-    updateItem.startDate = body.startDate;
     updateItem.endDate = body.endDate;
     updateItem.notes = body.notes;
 
