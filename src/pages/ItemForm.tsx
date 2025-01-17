@@ -1,8 +1,6 @@
 import axios from "axios";
-import { useState, ChangeEvent } from "react";
-import { Link } from "react-router-dom";
-
-import { BASE_URL } from "./ItemList";
+import { useState, ChangeEvent, useEffect } from "react";
+import { Link, useParams } from "react-router-dom";
 
 // define type form
 interface Iform {
@@ -21,7 +19,18 @@ interface IformErrors {
   notes?: string;
 }
 
-const ItemCreate = () => {
+// define props type
+interface Props {
+  apiURL: string;
+}
+
+const ItemForm = ({ apiURL }: Props) => {
+  // get id for edit mode
+  const { id } = useParams<{ id: string }>();
+
+  // parse to int
+  const itemId = id ? parseInt(id) : null;
+
   // create state from data
   const [formData, setFormData] = useState<Iform>({
     itemName: "",
@@ -29,6 +38,23 @@ const ItemCreate = () => {
     endDate: "",
     notes: "",
   });
+
+  // function fetchItem with axios
+  const fetchItem = async () => {
+    try {
+      const response = await axios.get(`${apiURL}/item/${itemId}`);
+      setFormData(response.data);
+    } catch (error) {
+      console.error("Error fetching items:", error);
+    }
+  };
+
+  // intial get item when have id
+  useEffect(() => {
+    if (itemId) {
+      fetchItem();
+    }
+  }, [itemId]);
 
   // function handle input change
   const handleInputChange = (e: ChangeEvent<HTMLInputElement> | ChangeEvent<HTMLTextAreaElement>) => {
@@ -55,28 +81,42 @@ const ItemCreate = () => {
   const [errors, setErrors] = useState<IformErrors>({});
 
   // function handle form submit
-  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
+  const handleSubmit = async () => {
     try {
-      // prevent form refesh page
-      e.preventDefault();
-
       const invalid: IformErrors = validForm(formData);
       setErrors(invalid);
 
       // check erros object is empty
       if (Object.keys(invalid).length === 0) {
-        await axios.post(`${BASE_URL}/create`, formData);
-        alert("Item created successfully");
+        // create mode
+        if (!id) {
+          await axios.post(`${apiURL}/create`, formData);
+          alert("Item created successfully");
+          return;
+        }
+        // edit mode
+        await axios.put(`${apiURL}/item/${itemId}`, formData);
+        alert("Item updated successfully");
       }
     } catch (error) {
       console.error("Error post items:", error);
     }
   };
 
+  // function handle form delete
+  const handleDelete = async () => {
+    try {
+      await axios.delete(`${apiURL}/item/${itemId}`);
+      alert("Item delete successfully");
+    } catch (error) {
+      console.error("Error post items:", error);
+    }
+  };
+
   return (
-    <form onSubmit={handleSubmit} className="py-5 flex flex-col gap-5 lg:px-40">
+    <div className="py-5 flex flex-col gap-5 lg:px-40">
       <div className="flex flex-col gap-5">
-        <h1 className="text-2xl font-bold text-gray-800">Create new item</h1>
+        <h1 className="text-2xl font-bold text-gray-800">{!id ? "Create new item" : "Edit item"}</h1>
         <p className="text-gray-500 text-sm lg:text-md">Lorem ipsum dolor sit amet consectetur adipisicing elit. Quibusdam, pariatur?</p>
         <hr />
       </div>
@@ -132,11 +172,24 @@ const ItemCreate = () => {
         <Link to="/">
           <button className="p-2 w-24 bg-[#d9d9d9] rounded-lg">Back</button>
         </Link>
-        <button type="submit" className="p-2 w-24 bg-green-500 rounded-lg text-white">
-          Create
-        </button>
+        {!id ? (
+          <>
+            <button onClick={handleSubmit} className="p-2 w-24 bg-green-500 rounded-lg text-white">
+              Create
+            </button>
+          </>
+        ) : (
+          <>
+            <button onClick={handleDelete} className="p-2 w-24 bg-red-500 rounded-lg  text-white">
+              Delete
+            </button>
+            <button onClick={handleSubmit} className="p-2 w-24 bg-blue-500 rounded-lg text-white">
+              Edit
+            </button>
+          </>
+        )}
       </div>
-    </form>
+    </div>
   );
 };
-export default ItemCreate;
+export default ItemForm;

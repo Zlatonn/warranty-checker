@@ -2,11 +2,8 @@ import { useEffect, useState } from "react";
 import Item from "../components/item/Item";
 import axios from "axios";
 
-// define base api URL
-export const BASE_URL: string = "http://localhost:8000";
-
-// define type items
-interface Iitems {
+// define items type
+interface Items {
   id: number;
   itemName: string;
   serialNumber: string;
@@ -14,21 +11,26 @@ interface Iitems {
   notes: string;
 }
 
-const ItemList = () => {
-  const [items, setItems] = useState<Iitems[]>([]);
-  // function fetchItem with axios
-  const fetchItem = async () => {
+// define props type
+interface Props {
+  apiURL: string;
+}
+
+const ItemList = ({ apiURL }: Props) => {
+  const [items, setItems] = useState<Items[]>([]);
+  // function fetchItems with axios
+  const fetchItems = async () => {
     try {
-      const response = await axios.get(`${BASE_URL}/items`);
+      const response = await axios.get(`${apiURL}/items`);
       setItems(response.data);
     } catch (error) {
       console.error("Error fetching items:", error);
     }
   };
 
-  // intial get item
+  // intial get items
   useEffect(() => {
-    fetchItem();
+    fetchItems();
   }, []);
 
   return (

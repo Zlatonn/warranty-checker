@@ -9,7 +9,7 @@ interface Props {
 
 const Item = ({ id, itemName, serialNumber }: Props) => {
   return (
-    <Link to={`/detail/${id}`}>
+    <Link to={`/edit/${id}`}>
       <div className="flex justify-between p-3 border-[1px] bg-[#fff] rounded-xl cursor-pointer hover:shadow-lg duration-300">
         {/* Left content */}
         <div className="flex flex-col justify-between gap-2 sm:gap-3">

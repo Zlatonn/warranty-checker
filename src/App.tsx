@@ -1,8 +1,10 @@
 import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
 import NavBar from "./components/navbar/Navbar";
 import ItemList from "./pages/ItemList";
-import ItemCreate from "./pages/ItemCreate";
-import ItemDetail from "./pages/ItemDetail";
+import ItemForm from "./pages/ItemForm";
+
+// define base api URL
+const BASE_URL: string = "http://localhost:8000";
 
 const App = () => {
   return (
@@ -11,9 +13,9 @@ const App = () => {
         <NavBar />
         <div className="container mx-auto py-10 px-10 sm:px-15 lg:px-20">
           <Routes>
-            <Route path="/" element={<ItemList />} />
-            <Route path="/create" element={<ItemCreate />} />
-            <Route path="/detail/:id" element={<ItemDetail />} />
+            <Route path="/" element={<ItemList apiURL={BASE_URL} />} />
+            <Route path="/create" element={<ItemForm apiURL={BASE_URL} />} />
+            <Route path="/edit/:id" element={<ItemForm apiURL={BASE_URL} />} />
           </Routes>
         </div>
       </div>
