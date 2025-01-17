@@ -1,6 +1,6 @@
 import axios from "axios";
 import { useState, ChangeEvent, useEffect } from "react";
-import { Link, useParams } from "react-router-dom";
+import { Link, useNavigate, useParams } from "react-router-dom";
 
 // define type form
 interface Iform {
@@ -27,6 +27,7 @@ interface Props {
 const ItemForm = ({ apiURL }: Props) => {
   // get id for edit mode
   const { id } = useParams<{ id: string }>();
+  const navigate = useNavigate();
 
   // parse to int
   const itemId = id ? parseInt(id) : null;
@@ -92,11 +93,13 @@ const ItemForm = ({ apiURL }: Props) => {
         if (!id) {
           await axios.post(`${apiURL}/create`, formData);
           alert("Item created successfully");
+          navigate("/");
           return;
         }
         // edit mode
         await axios.put(`${apiURL}/item/${itemId}`, formData);
         alert("Item updated successfully");
+        navigate("/");
       }
     } catch (error) {
       console.error("Error post items:", error);
@@ -108,6 +111,7 @@ const ItemForm = ({ apiURL }: Props) => {
     try {
       await axios.delete(`${apiURL}/item/${itemId}`);
       alert("Item delete successfully");
+      navigate("/");
     } catch (error) {
       console.error("Error post items:", error);
     }
