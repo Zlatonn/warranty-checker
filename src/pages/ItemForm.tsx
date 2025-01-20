@@ -57,6 +57,7 @@ const ItemForm = ({ apiURL }: Props) => {
     if (itemId) {
       fetchItem();
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [itemId]);
 
   // function handle input change

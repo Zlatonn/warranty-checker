@@ -12,7 +12,9 @@ interface Props {
 const Item = ({ id, itemName, serialNumber, remainDays, isWarranty }: Props) => {
   return (
     <Link to={`/edit/${id}`}>
-      <div className="flex justify-between p-3 border-[1px] bg-[#fff] rounded-xl cursor-pointer hover:shadow-lg duration-300">
+      <div
+        className={`flex justify-between p-3 border-[1px] rounded-xl cursor-pointer hover:bg-[#f5f7f9] hover:shadow-lg hover:-translate-y-1 duration-500`}
+      >
         {/* Left content */}
         <div className="flex flex-col justify-between gap-2 sm:gap-3">
           <p className="text-sm text-gray-700">serial: {serialNumber}</p>
@@ -24,8 +26,8 @@ const Item = ({ id, itemName, serialNumber, remainDays, isWarranty }: Props) => 
         </div>
         {/* right content */}
         <div className="flex flex-col justify-between items-end gap-3">
-          <p className="text-sm text-gray-700">
-            remainding : <span className="font-bold">{remainDays} days</span>
+          <p className={`text-xs text-white py-1 px-2 rounded-lg ${isWarranty ? "bg-green-500" : "bg-red-500"}`}>
+            {Math.abs(remainDays)} days {isWarranty ? "left" : "ago"}
           </p>
         </div>
       </div>

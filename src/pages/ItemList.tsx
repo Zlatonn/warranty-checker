@@ -35,6 +35,7 @@ const ItemList = ({ apiURL }: Props) => {
   // intial get items
   useEffect(() => {
     fetchItems();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   // state for select display
