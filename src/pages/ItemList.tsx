@@ -9,6 +9,8 @@ interface Items {
   serialNumber: string;
   endDate: string;
   notes: string;
+  remainDays: number;
+  isWarranty: boolean;
 }
 
 // define props type
@@ -46,7 +48,16 @@ const ItemList = ({ apiURL }: Props) => {
       {items && items.length ? (
         <div className=" mt-10 grid grid-cols-1 lg:grid-cols-2 2xl:grid-cols-3 gap-6">
           {items.map((item) => {
-            return <Item key={item.id} id={item.id} itemName={item.itemName} serialNumber={item.serialNumber} />;
+            return (
+              <Item
+                key={item.id}
+                id={item.id}
+                itemName={item.itemName}
+                serialNumber={item.serialNumber}
+                remainDays={item.remainDays}
+                isWarranty={item.isWarranty}
+              />
+            );
           })}
         </div>
       ) : (

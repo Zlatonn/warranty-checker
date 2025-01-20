@@ -8,6 +8,8 @@ interface Iform {
   serialNumber: string;
   endDate: string;
   notes: string;
+  remainDays?: number;
+  isWarranty?: boolean;
 }
 
 // define type form errors
