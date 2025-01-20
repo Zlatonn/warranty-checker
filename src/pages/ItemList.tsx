@@ -10,7 +10,7 @@ interface Items {
   endDate: string;
   notes: string;
   remainDays: number;
-  isWarranty: boolean;
+  isWarranty: "warranty" | "nearExpire" | "expired";
 }
 
 // define props type
@@ -54,10 +54,13 @@ const ItemList = ({ apiURL, searchQuery }: Props) => {
       case "all":
         break;
       case "warranty":
-        filterdItems = items.filter((item) => item.isWarranty === true);
+        filterdItems = items.filter((item) => item.isWarranty === "warranty");
+        break;
+      case "nearExpire":
+        filterdItems = items.filter((item) => item.isWarranty === "nearExpire");
         break;
       case "expired":
-        filterdItems = items.filter((item) => item.isWarranty === false);
+        filterdItems = items.filter((item) => item.isWarranty === "expired");
         break;
       default:
         break;
@@ -81,6 +84,7 @@ const ItemList = ({ apiURL, searchQuery }: Props) => {
         <select value={selectDisplay} onChange={(e) => setSelectDisplay(e.target.value)} className="text-gray-400 text-center outline-none">
           <option value="all">all</option>
           <option value="warranty">warranty</option>
+          <option value="nearExpire">near expire</option>
           <option value="expired">expired</option>
         </select>
       </div>

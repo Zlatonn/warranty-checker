@@ -19,7 +19,7 @@ interface Iitems {
   endDate: string;
   notes: string;
   remainDays: number;
-  isWarranty: boolean;
+  isWarranty: "warranty" | "nearExpire" | "expired";
 }
 
 // store item list
@@ -50,7 +50,18 @@ const checkWanrranty = (date: string) => {
   const msDiff = timeEnd.getTime() - timeCurr.getTime();
   const dayDiff = Math.ceil(msDiff / (1000 * 60 * 60 * 24));
 
-  return dayDiff >= 0 ? { dayDiff: dayDiff + 1, isWarranty: true } : { dayDiff, isWarranty: false };
+  const daysLeft = dayDiff >= 0 ? dayDiff + 1 : dayDiff;
+  let isWarranty: "warranty" | "nearExpire" | "expired" = "warranty";
+
+  if (daysLeft >= 30) {
+    isWarranty = "warranty";
+  } else if (daysLeft >= 0 && daysLeft < 30) {
+    isWarranty = "nearExpire";
+  } else {
+    isWarranty = "expired";
+  }
+
+  return { daysLeft, isWarranty };
 };
 
 /** ----- PATH => get all items ----- */
@@ -102,7 +113,7 @@ app.post("/create", (req: Request, res: Response) => {
     }
 
     // check warranty item
-    const { dayDiff, isWarranty } = checkWanrranty(body.endDate);
+    const { daysLeft, isWarranty } = checkWanrranty(body.endDate);
 
     // manage pattern data
     const newItem = {
@@ -111,7 +122,7 @@ app.post("/create", (req: Request, res: Response) => {
       serialNumber: body.serialNumber,
       endDate: body.endDate,
       notes: body.notes,
-      remainDays: dayDiff,
+      remainDays: daysLeft,
       isWarranty: isWarranty,
     };
 

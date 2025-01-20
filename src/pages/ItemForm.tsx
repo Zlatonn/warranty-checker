@@ -9,14 +9,13 @@ interface Iform {
   endDate: string;
   notes: string;
   remainDays?: number;
-  isWarranty?: boolean;
+  isWarranty?: "warranty" | "nearExpire" | "expired";
 }
 
 // define type form errors
 interface IformErrors {
   itemName?: string;
   serialNumber?: string;
-  startDate?: string;
   endDate?: string;
   notes?: string;
 }
@@ -130,7 +129,11 @@ const ItemForm = ({ apiURL }: Props) => {
     <div className="py-5 flex flex-col gap-5 lg:px-40">
       <div className="flex flex-col gap-5">
         <h1 className="text-2xl font-bold text-gray-800">{!id ? "Create new item" : "Edit item"}</h1>
-        <p className="text-gray-500 text-sm lg:text-md">Lorem ipsum dolor sit amet consectetur adipisicing elit. Quibusdam, pariatur?</p>
+        <p className="text-gray-500 text-sm lg:text-md">
+          {!id
+            ? "This feature allows users to add a new item to the system. You can input the item's details such as name, serial number, warranty end date, and any additional notes. Once submitted, the item will be saved and displayed in the item list for tracking."
+            : "This feature enables users to update the details of an existing item. You can modify the item's name, serial number, warranty information, or notes. This ensures that item details remain accurate and up to date in the system."}
+        </p>
         <hr />
       </div>
       <div className="flex flex-col gap-8 text-gray-500">
