@@ -19,7 +19,9 @@ interface Props {
 }
 
 const ItemList = ({ apiURL }: Props) => {
+  // state for items that get from api
   const [items, setItems] = useState<Items[]>([]);
+
   // function fetchItems with axios
   const fetchItems = async () => {
     try {
@@ -35,19 +37,42 @@ const ItemList = ({ apiURL }: Props) => {
     fetchItems();
   }, []);
 
+  // state for select display
+  const [selectDisplay, setSelectDisplay] = useState("all");
+
+  // state for currItems
+  const [currItems, setCurrItems] = useState<Items[]>([]);
+
+  //set current items with select display condition
+  useEffect(() => {
+    switch (selectDisplay) {
+      case "all":
+        setCurrItems(items);
+        break;
+      case "warranty":
+        setCurrItems(items.filter((item) => item.isWarranty === true));
+        break;
+      case "expired":
+        setCurrItems(items.filter((item) => item.isWarranty === false));
+        break;
+      default:
+        break;
+    }
+  }, [selectDisplay, items]);
+
   return (
     <div className="flex flex-col">
       <div className="flex justify-end gap-3">
         <p className="text-gray-800">Show :</p>
-        <select className="text-gray-400 text-center outline-none">
+        <select value={selectDisplay} onChange={(e) => setSelectDisplay(e.target.value)} className="text-gray-400 text-center outline-none">
           <option value="all">all</option>
           <option value="warranty">warranty</option>
           <option value="expired">expired</option>
         </select>
       </div>
-      {items && items.length ? (
+      {currItems && currItems.length ? (
         <div className=" mt-10 grid grid-cols-1 lg:grid-cols-2 2xl:grid-cols-3 gap-6">
-          {items.map((item) => {
+          {currItems.map((item) => {
             return (
               <Item
                 key={item.id}

@@ -50,7 +50,7 @@ const checkWanrranty = (date: string) => {
   const msDiff = timeEnd.getTime() - timeCurr.getTime();
   const dayDiff = Math.ceil(msDiff / (1000 * 60 * 60 * 24));
 
-  return dayDiff > 0 ? { dayDiff: dayDiff + 1, isWarranty: true } : { dayDiff, isWarranty: false };
+  return dayDiff >= 0 ? { dayDiff: dayDiff + 1, isWarranty: true } : { dayDiff, isWarranty: false };
 };
 
 /** ----- PATH => get all items ----- */

@@ -110,6 +110,10 @@ const ItemForm = ({ apiURL }: Props) => {
 
   // function handle form delete
   const handleDelete = async () => {
+    const isConfirmed = confirm("Are you sure you want to delete this item?");
+    if (!isConfirmed) {
+      return;
+    }
     try {
       await axios.delete(`${apiURL}/item/${itemId}`);
       alert("Item delete successfully");
