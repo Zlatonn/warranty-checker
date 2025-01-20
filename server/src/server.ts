@@ -18,6 +18,8 @@ interface Iitems {
   serialNumber: string;
   endDate: string;
   notes: string;
+  remainDays: number;
+  isWarranty: boolean;
 }
 
 // store item list
@@ -34,6 +36,21 @@ const validForm = (body: Iitems): string[] => {
   if (!body.endDate) errors.push("endDate is required");
   if (!body.notes) errors.push("notes is required");
   return errors;
+};
+
+// function check warranty
+const checkWanrranty = (date: string) => {
+  const timeCurr = new Date();
+  const timeEnd = new Date(date);
+
+  // Reset hours to 00:00:00 for accurate day comparison
+  timeCurr.setHours(0, 0, 0, 0);
+  timeEnd.setHours(0, 0, 0, 0);
+
+  const msDiff = timeEnd.getTime() - timeCurr.getTime();
+  const dayDiff = Math.ceil(msDiff / (1000 * 60 * 60 * 24));
+
+  return dayDiff > 0 ? { dayDiff: dayDiff + 1, isWarranty: true } : { dayDiff, isWarranty: false };
 };
 
 /** ----- PATH => get all items ----- */
@@ -84,14 +101,18 @@ app.post("/create", (req: Request, res: Response) => {
       return;
     }
 
+    // check warranty item
+    const { dayDiff, isWarranty } = checkWanrranty(body.endDate);
+
     // manage pattern data
     const newItem = {
       id: id,
       itemName: body.itemName,
       serialNumber: body.serialNumber,
-      startDate: body.startDate,
       endDate: body.endDate,
       notes: body.notes,
+      remainDays: dayDiff,
+      isWarranty: isWarranty,
     };
 
     // add new item
