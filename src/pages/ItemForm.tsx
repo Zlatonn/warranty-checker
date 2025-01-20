@@ -29,6 +29,8 @@ interface Props {
 const ItemForm = ({ apiURL }: Props) => {
   // get id for edit mode
   const { id } = useParams<{ id: string }>();
+
+  // useNavigate for manual channge route
   const navigate = useNavigate();
 
   // parse to int

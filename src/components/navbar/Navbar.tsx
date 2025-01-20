@@ -1,4 +1,4 @@
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import searchIcon from "../../assets/search_icon.png";
 import { useState } from "react";
 
@@ -8,12 +8,23 @@ interface Props {
 }
 
 const NavBar = ({ setSearchQuery }: Props) => {
+  // useNavigate for manual channge route
+  const navigate = useNavigate();
+
   // create local state
   const [searchInput, setSearchInput] = useState("");
 
   // update seach query when click search buttom
-  const handleClick = () => {
+  const handleSearch = () => {
     setSearchQuery(searchInput);
+    navigate("/");
+  };
+
+  // when push enter at search input
+  const handleKeyEnter = (event: React.KeyboardEvent<HTMLInputElement>) => {
+    if (event.key === "Enter") {
+      handleSearch();
+    }
   };
 
   return (
@@ -41,11 +52,12 @@ const NavBar = ({ setSearchQuery }: Props) => {
               type="text"
               value={searchInput}
               onChange={(e) => setSearchInput(e.target.value)}
+              onKeyDown={handleKeyEnter}
               placeholder="Enter search item..."
               className="flex-1 bg-transparent pl-3 border-none outline-none sm:pr-40 lg:pr-80"
             />
             <button className=" w-10 p-2 bg-[#d9d9d9]">
-              <img src={searchIcon} onClick={handleClick} className="object-cover" />
+              <img src={searchIcon} onClick={handleSearch} className="object-cover" />
             </button>
           </div>
           <Link to="/create">
