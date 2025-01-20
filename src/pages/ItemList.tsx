@@ -16,9 +16,10 @@ interface Items {
 // define props type
 interface Props {
   apiURL: string;
+  searchQuery: string;
 }
 
-const ItemList = ({ apiURL }: Props) => {
+const ItemList = ({ apiURL, searchQuery }: Props) => {
   // state for items that get from api
   const [items, setItems] = useState<Items[]>([]);
 
@@ -44,22 +45,34 @@ const ItemList = ({ apiURL }: Props) => {
   // state for currItems
   const [currItems, setCurrItems] = useState<Items[]>([]);
 
-  //set current items with select display condition
+  // update current items
   useEffect(() => {
+    let filterdItems = items;
+
+    // filter with display filter condition
     switch (selectDisplay) {
       case "all":
-        setCurrItems(items);
         break;
       case "warranty":
-        setCurrItems(items.filter((item) => item.isWarranty === true));
+        filterdItems = items.filter((item) => item.isWarranty === true);
         break;
       case "expired":
-        setCurrItems(items.filter((item) => item.isWarranty === false));
+        filterdItems = items.filter((item) => item.isWarranty === false);
         break;
       default:
         break;
     }
-  }, [selectDisplay, items]);
+
+    // if have text at search box => second filter with search box
+    if (searchQuery) {
+      filterdItems = filterdItems.filter(
+        (item) =>
+          item.itemName.toLowerCase().includes(searchQuery.toLowerCase()) ||
+          item.serialNumber.toLowerCase().includes(searchQuery.toLowerCase())
+      );
+    }
+    setCurrItems(filterdItems);
+  }, [selectDisplay, items, searchQuery]);
 
   return (
     <div className="flex flex-col">
