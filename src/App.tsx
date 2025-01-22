@@ -1,9 +1,11 @@
 import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
+import { ReactQueryDevtools } from "@tanstack/react-query-devtools";
+import { useState } from "react";
+
 import NavBar from "./components/navbar/Navbar";
 import ItemList from "./pages/ItemList";
 import ItemForm from "./pages/ItemForm";
-import { useState } from "react";
 
 // define base api URL
 const BASE_URL: string = "http://localhost:8000";
@@ -29,6 +31,7 @@ const App = () => {
           </div>
         </div>
       </Router>
+      <ReactQueryDevtools initialIsOpen={true} buttonPosition="bottom-right" />
     </QueryClientProvider>
   );
 };
