@@ -25,7 +25,7 @@ interface Iitems {
 // store item list
 const items: Iitems[] = [];
 
-// define id
+// define initial id
 let id: number = 1;
 
 // function valid form
@@ -64,13 +64,18 @@ const checkWanrranty = (date: string) => {
   return { daysLeft, isWarranty };
 };
 
-/** ----- PATH => get all items ----- */
+/** ---------- PATH => get all items ---------- */
 app.get("/items", (req: Request, res: Response) => {
-  // return all items
-  res.json(items);
+  try {
+    // return all items
+    res.status(200).json(items);
+  } catch (error) {
+    console.error("Error fetching items:", error);
+    res.status(500).json({ error: "Internal server error" });
+  }
 });
 
-/** ----- PATH => get specific item ----- */
+/** ---------- PATH => get specific item ---------- */
 app.get("/item/:id", (req: Request, res: Response) => {
   try {
     // get id from params
@@ -92,14 +97,14 @@ app.get("/item/:id", (req: Request, res: Response) => {
     }
 
     // return specfic item
-    res.json(getItem);
+    res.status(200).json(getItem);
   } catch (error) {
-    console.error("Error:", error);
+    console.error("Error fetching item:", error);
     res.status(500).json({ error: "Internal server error" });
   }
 });
 
-/** ----- PATH => create item ----- */
+/** ---------- PATH => create item ---------- */
 app.post("/create", (req: Request, res: Response) => {
   try {
     // get data from body
@@ -138,12 +143,12 @@ app.post("/create", (req: Request, res: Response) => {
       newItem: newItem,
     });
   } catch (error) {
-    console.error("Error:", error);
+    console.error("Error create item:", error);
     res.status(500).json({ error: "Internal server error" });
   }
 });
 
-/** ----- PATH => update item ----- */
+/** ---------- PATH => update item ---------- */
 app.put("/item/:id", (req: Request, res: Response) => {
   try {
     // get id from params
@@ -181,17 +186,17 @@ app.put("/item/:id", (req: Request, res: Response) => {
     updateItem.notes = body.notes;
 
     // response command
-    res.status(201).json({
+    res.status(200).json({
       message: "update complete",
       data: updateItem,
     });
   } catch (error) {
-    console.error("Error:", error);
+    console.error("Error updating item:", error);
     res.status(500).json({ error: "Internal server error" });
   }
 });
 
-/** ----- PATH => delete item ----- */
+/** ---------- PATH => delete item ---------- */
 app.delete("/item/:id", (req: Request, res: Response) => {
   try {
     // get id from params
@@ -219,12 +224,12 @@ app.delete("/item/:id", (req: Request, res: Response) => {
     items.splice(deleteIndex, 1);
 
     // response command
-    res.json({
+    res.status(200).json({
       message: "delete complete",
       data: deleteData,
     });
   } catch (error) {
-    console.error("Error:", error);
+    console.error("Error deleting item:", error);
     res.status(500).json({ error: "Internal server error" });
   }
 });
