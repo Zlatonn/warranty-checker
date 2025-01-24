@@ -32,7 +32,7 @@ export const useGetItems = () => {
 };
 
 // fetch get single item
-export const useGetItem = (id: number) => {
+export const useGetItem = (id: string) => {
   return useQuery({
     queryKey: ["item", id],
     queryFn: async () => {
@@ -46,25 +46,28 @@ export const useGetItem = (id: number) => {
 // fetch create item
 export const useCreateItem = () => {
   return useMutation({
-    mutationFn: async ({ newItem }: { newItem: Item }) => {
+    mutationKey: ["createItem"],
+    mutationFn: async (newItem: Item) => {
       return await axiosClient.post(`/create`, newItem);
     },
   });
 };
 
 // fetch update item
-export const useUpdateItem = () => {
+export const useUpdateItem = (id: string) => {
   return useMutation({
-    mutationFn: async ({ id, newItem }: { id: number; newItem: Item }) => {
+    mutationKey: ["UpdateItem", id],
+    mutationFn: async (newItem: Item) => {
       return await axiosClient.put(`/item/${id}`, newItem);
     },
   });
 };
 
 // fetch delete item
-export const useDeleteItem = () => {
+export const useDeleteItem = (id: string) => {
   return useMutation({
-    mutationFn: async (id: number) => {
+    mutationKey: ["DeleteItem", id],
+    mutationFn: async () => {
       return await axiosClient.delete(`/item/${id}`);
     },
   });
