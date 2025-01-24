@@ -7,9 +7,6 @@ import NavBar from "./components/navbar/Navbar";
 import ItemList from "./pages/ItemList";
 import ItemForm from "./pages/ItemForm";
 
-// define base api URL
-const BASE_URL: string = "http://localhost:8000";
-
 // create client
 const queryClient = new QueryClient();
 
@@ -24,9 +21,9 @@ const App = () => {
           <NavBar setSearchQuery={setSearchQuery} />
           <div className="container mx-auto py-10 px-10 sm:px-15 lg:px-20">
             <Routes>
-              <Route path="/" element={<ItemList apiURL={BASE_URL} searchQuery={searchQuery} />} />
-              <Route path="/create" element={<ItemForm apiURL={BASE_URL} />} />
-              <Route path="/edit/:id" element={<ItemForm apiURL={BASE_URL} />} />
+              <Route path="/" element={<ItemList searchQuery={searchQuery} />} />
+              <Route path="/create" element={<ItemForm />} />
+              <Route path="/edit/:id" element={<ItemForm />} />
             </Routes>
           </div>
         </div>
