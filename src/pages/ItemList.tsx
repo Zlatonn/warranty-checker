@@ -1,8 +1,9 @@
 import { useEffect, useState } from "react";
-import Item from "../components/item/Item";
-import axios from "axios";
+import { useGetItems } from "../hooks/useApi";
 
-// define items type
+import Item from "../components/item/Item";
+
+// Define items type
 interface Items {
   id: number;
   itemName: string;
@@ -13,70 +14,72 @@ interface Items {
   isWarranty: "warranty" | "nearExpire" | "expired";
 }
 
-// define props type
+// Define props type
 interface Props {
-  apiURL: string;
   searchQuery: string;
 }
 
-const ItemList = ({ apiURL, searchQuery }: Props) => {
-  // state for items that get from api
-  const [items, setItems] = useState<Items[]>([]);
+const ItemList = ({ searchQuery }: Props) => {
+  // Fetch items using useGetItems()
+  const { data: items, isLoading, isError, error } = useGetItems();
 
-  // function fetchItems with axios
-  const fetchItems = async () => {
-    try {
-      const response = await axios.get(`${apiURL}/items`);
-      setItems(response.data);
-    } catch (error) {
-      console.error("Error fetching items:", error);
-    }
-  };
-
-  // intial get items
-  useEffect(() => {
-    fetchItems();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
-
-  // state for select display
+  // Create state for select display
   const [selectDisplay, setSelectDisplay] = useState("all");
 
-  // state for currItems
+  // Create state for currItems
   const [currItems, setCurrItems] = useState<Items[]>([]);
 
-  // update current items
+  // Update current items to display
   useEffect(() => {
     let filterdItems = items;
 
-    // filter with display filter condition
+    // Filter with display filter condition
     switch (selectDisplay) {
       case "all":
         break;
       case "warranty":
-        filterdItems = items.filter((item) => item.isWarranty === "warranty");
+        filterdItems = items.filter((item: Items) => item.isWarranty === "warranty");
         break;
       case "nearExpire":
-        filterdItems = items.filter((item) => item.isWarranty === "nearExpire");
+        filterdItems = items.filter((item: Items) => item.isWarranty === "nearExpire");
         break;
       case "expired":
-        filterdItems = items.filter((item) => item.isWarranty === "expired");
+        filterdItems = items.filter((item: Items) => item.isWarranty === "expired");
         break;
       default:
         break;
     }
 
-    // if have text at search box => second filter with search box
+    // If have text at search box => second filter with search box
     if (searchQuery) {
       filterdItems = filterdItems.filter(
-        (item) =>
+        (item: Items) =>
           item.itemName.toLowerCase().includes(searchQuery.toLowerCase()) ||
           item.serialNumber.toLowerCase().includes(searchQuery.toLowerCase())
       );
     }
     setCurrItems(filterdItems);
-  }, [selectDisplay, items, searchQuery]);
+  }, [items, selectDisplay, searchQuery]);
 
+  // Return JSX with loading condition
+  if (isLoading) {
+    return (
+      <div className="mt-10">
+        <p className="text-2xl text-gray-800">Loading...</p>
+      </div>
+    );
+  }
+
+  // Return JSX with error condition
+  if (isError) {
+    return (
+      <div className="mt-10">
+        <p className="text-2xl text-red-500">{error.message}</p>
+      </div>
+    );
+  }
+
+  //Return JSX with normal condition
   return (
     <div className="flex flex-col">
       <div className="flex justify-end gap-3">
@@ -105,7 +108,7 @@ const ItemList = ({ apiURL, searchQuery }: Props) => {
         </div>
       ) : (
         <div className="mt-10">
-          <p className="text-2xl text-gray-">No items</p>
+          <p className="text-2xl text-gray-800">No items</p>
         </div>
       )}
     </div>

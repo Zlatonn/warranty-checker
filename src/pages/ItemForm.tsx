@@ -1,8 +1,8 @@
-import axios from "axios";
 import { useState, ChangeEvent, useEffect } from "react";
 import { Link, useNavigate, useParams } from "react-router-dom";
+import { useGetItem, useCreateItem, useUpdateItem, useDeleteItem } from "../hooks/useApi";
 
-// define type form
+// Define type form
 interface Iform {
   itemName: string;
   serialNumber: string;
@@ -12,7 +12,7 @@ interface Iform {
   isWarranty?: "warranty" | "nearExpire" | "expired";
 }
 
-// define type form errors
+// Define type form errors
 interface IformErrors {
   itemName?: string;
   serialNumber?: string;
@@ -20,22 +20,11 @@ interface IformErrors {
   notes?: string;
 }
 
-// define props type
-interface Props {
-  apiURL: string;
-}
-
-const ItemForm = ({ apiURL }: Props) => {
-  // get id for edit mode
-  const { id } = useParams<{ id: string }>();
-
-  // useNavigate for manual channge route
+const ItemForm = () => {
+  // useNavigate for manual change route
   const navigate = useNavigate();
 
-  // parse to int
-  const itemId = id ? parseInt(id) : null;
-
-  // create state from data
+  // Create state formData
   const [formData, setFormData] = useState<Iform>({
     itemName: "",
     serialNumber: "",
@@ -43,25 +32,32 @@ const ItemForm = ({ apiURL }: Props) => {
     notes: "",
   });
 
-  // function fetchItem with axios
-  const fetchItem = async () => {
-    try {
-      const response = await axios.get(`${apiURL}/item/${itemId}`);
-      setFormData(response.data);
-    } catch (error) {
-      console.error("Error fetching items:", error);
-    }
-  };
+  // Create state errors
+  const [errors, setErrors] = useState<IformErrors>({});
 
-  // intial get item when have id
+  // Fetch create item useing useCreateItem
+  const { mutateAsync: createItem } = useCreateItem();
+
+  // Create state id
+  const [itemId, setItemId] = useState("");
+
+  // Get id for edit mode
+  const { id } = useParams<{ id: string }>();
+
+  // Fetch item ,update, delete item using useCreateItem, useUpdateItem, useDeleteItem
+  const { data: item, isLoading, isError, error } = useGetItem(itemId);
+  const { mutateAsync: updateItem } = useUpdateItem(itemId);
+  const { mutateAsync: deleteItem } = useDeleteItem(itemId);
+
+  // Update form itemId & formData
   useEffect(() => {
-    if (itemId) {
-      fetchItem();
+    if (id) {
+      setItemId(id);
+      setFormData(item);
     }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [itemId]);
+  }, [id, item]);
 
-  // function handle input change
+  // Function handle input change
   const handleInputChange = (e: ChangeEvent<HTMLInputElement> | ChangeEvent<HTMLTextAreaElement>) => {
     const { name, value } = e.target;
     {
@@ -72,7 +68,7 @@ const ItemForm = ({ apiURL }: Props) => {
     }
   };
 
-  // function valid form
+  // Function valid form
   const validForm = (body: Iform) => {
     const validErrors: IformErrors = {};
     if (!body.itemName) validErrors.itemName = "*** Item name is required ***";
@@ -82,55 +78,79 @@ const ItemForm = ({ apiURL }: Props) => {
     return validErrors;
   };
 
-  // create state errors
-  const [errors, setErrors] = useState<IformErrors>({});
-
-  // function handle form submit
+  // Function handle form submit
   const handleSubmit = async () => {
-    try {
-      const invalid: IformErrors = validForm(formData);
-      setErrors(invalid);
+    const invalid: IformErrors = validForm(formData);
+    setErrors(invalid);
 
-      // check erros object is empty
-      if (Object.keys(invalid).length === 0) {
-        // create mode
-        if (!id) {
-          await axios.post(`${apiURL}/create`, formData);
-          alert("Item created successfully");
+    // Check erros object is empty
+    if (Object.keys(invalid).length === 0) {
+      // Check mode
+      if (!itemId) {
+        // Create mode
+        try {
+          await createItem(formData);
+          alert("The item has been successfully created. ✅");
           navigate("/");
-          return;
+        } catch (error) {
+          console.error("Error post item:", error);
+          alert("Failed to create the item. Please try again later. ❌");
         }
-        // edit mode
-        await axios.put(`${apiURL}/item/${itemId}`, formData);
-        alert("Item updated successfully");
-        navigate("/");
+        return;
       }
-    } catch (error) {
-      console.error("Error post items:", error);
+      // Edit mode
+      try {
+        await updateItem(formData);
+        alert("The item has been successfully updated. ✅");
+        navigate("/");
+      } catch (error) {
+        console.error("Error put item:", error);
+        alert("Failed to update the item. Please try again later. ❌");
+      }
     }
   };
 
-  // function handle form delete
+  // Function handle form delete
   const handleDelete = async () => {
     const isConfirmed = confirm("Are you sure you want to delete this item?");
     if (!isConfirmed) {
       return;
     }
     try {
-      await axios.delete(`${apiURL}/item/${itemId}`);
-      alert("Item delete successfully");
+      await deleteItem();
+      alert("The item has been successfully deleted. ✅");
       navigate("/");
     } catch (error) {
-      console.error("Error post items:", error);
+      console.error("Error delete item:", error);
+      alert("Failed to delete the item. Please try again later. ❌");
     }
   };
 
+  // Return JSX with loading condition
+  if (isLoading) {
+    return (
+      <div className="mt-10">
+        <p className="text-2xl text-gray-800">Loading...</p>
+      </div>
+    );
+  }
+
+  // Return JSX with error condition
+  if (isError) {
+    return (
+      <div className="mt-10">
+        <p className="text-2xl text-red-500">{error.message}</p>
+      </div>
+    );
+  }
+
+  // Return JSX with normal condition
   return (
     <div className="py-5 flex flex-col gap-5 lg:px-40">
       <div className="flex flex-col gap-5">
-        <h1 className="text-2xl font-bold text-gray-800">{!id ? "Create new item" : "Edit item"}</h1>
+        <h1 className="text-2xl font-bold text-gray-800">{!itemId ? "Create new item" : "Edit item"}</h1>
         <p className="text-gray-500 text-sm lg:text-md">
-          {!id
+          {!itemId
             ? "This feature allows users to add a new item to the system. You can input the item's details such as name, serial number, warranty end date, and any additional notes. Once submitted, the item will be saved and displayed in the item list for tracking."
             : "This feature enables users to update the details of an existing item. You can modify the item's name, serial number, warranty information, or notes. This ensures that item details remain accurate and up to date in the system."}
         </p>
@@ -143,7 +163,7 @@ const ItemForm = ({ apiURL }: Props) => {
             type="text"
             placeholder="type item name..."
             name="itemName"
-            value={formData.itemName}
+            value={formData?.itemName}
             onChange={handleInputChange}
             className="w-full px-2 py-1 rounded-lg border-[1px] focus:outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500"
           />
@@ -155,7 +175,7 @@ const ItemForm = ({ apiURL }: Props) => {
             type="text"
             placeholder="type serial number..."
             name="serialNumber"
-            value={formData.serialNumber}
+            value={formData?.serialNumber}
             onChange={handleInputChange}
             className="w-full px-2 py-1 rounded-lg border-[1px] focus:outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500"
           />
@@ -166,7 +186,7 @@ const ItemForm = ({ apiURL }: Props) => {
           <input
             type="date"
             name="endDate"
-            value={formData.endDate}
+            value={formData?.endDate}
             onChange={handleInputChange}
             className="w-full px-2 py-1 rounded-lg border-[1px] focus:outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500"
           />
@@ -177,7 +197,7 @@ const ItemForm = ({ apiURL }: Props) => {
           <textarea
             placeholder="type notes..."
             name="notes"
-            value={formData.notes}
+            value={formData?.notes}
             onChange={handleInputChange}
             className="w-full px-2 py-1 rounded-lg border-[1px] focus:outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500"
           />
@@ -188,7 +208,7 @@ const ItemForm = ({ apiURL }: Props) => {
         <Link to="/">
           <button className="p-2 w-24 bg-[#d9d9d9] rounded-lg">Back</button>
         </Link>
-        {!id ? (
+        {!itemId ? (
           <>
             <button onClick={handleSubmit} className="p-2 w-24 bg-green-500 rounded-lg text-white">
               Create
