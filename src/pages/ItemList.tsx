@@ -1,10 +1,9 @@
 import { useEffect, useState } from "react";
-import { useQuery } from "@tanstack/react-query";
-import axios from "axios";
+import { useGetItems } from "../hooks/useApi";
 
 import Item from "../components/item/Item";
 
-// define items type
+// Define items type
 interface Items {
   id: number;
   itemName: string;
@@ -15,41 +14,26 @@ interface Items {
   isWarranty: "warranty" | "nearExpire" | "expired";
 }
 
-// define props type
+// Define props type
 interface Props {
-  apiURL: string;
   searchQuery: string;
 }
 
-const ItemList = ({ apiURL, searchQuery }: Props) => {
-  // function fetchItems with axios
-  const fetchItems = async () => {
-    const response = await axios.get(`${apiURL}/items`);
-    return response.data;
-  };
+const ItemList = ({ searchQuery }: Props) => {
+  // Fetch items using useGetItems()
+  const { data: items, isLoading, isError, error } = useGetItems();
 
-  // useQuery for manage fetching items
-  const {
-    data: items,
-    isLoading,
-    isError,
-    error,
-  } = useQuery({
-    queryKey: ["items"],
-    queryFn: fetchItems,
-  });
-
-  // state for select display
+  // Create state for select display
   const [selectDisplay, setSelectDisplay] = useState("all");
 
-  // state for currItems
+  // Create state for currItems
   const [currItems, setCurrItems] = useState<Items[]>([]);
 
-  // update current items
+  // Update current items to display
   useEffect(() => {
     let filterdItems = items;
 
-    // filter with display filter condition
+    // Filter with display filter condition
     switch (selectDisplay) {
       case "all":
         break;
@@ -66,7 +50,7 @@ const ItemList = ({ apiURL, searchQuery }: Props) => {
         break;
     }
 
-    // if have text at search box => second filter with search box
+    // If have text at search box => second filter with search box
     if (searchQuery) {
       filterdItems = filterdItems.filter(
         (item: Items) =>
@@ -77,6 +61,25 @@ const ItemList = ({ apiURL, searchQuery }: Props) => {
     setCurrItems(filterdItems);
   }, [items, selectDisplay, searchQuery]);
 
+  // Return JSX with loading condition
+  if (isLoading) {
+    return (
+      <div className="mt-10">
+        <p className="text-2xl text-gray-800">Loading...</p>
+      </div>
+    );
+  }
+
+  // Return JSX with error condition
+  if (isError) {
+    return (
+      <div className="mt-10">
+        <p className="text-2xl text-red-500">{error.message}</p>
+      </div>
+    );
+  }
+
+  //Return JSX with normal condition
   return (
     <div className="flex flex-col">
       <div className="flex justify-end gap-3">
@@ -88,16 +91,7 @@ const ItemList = ({ apiURL, searchQuery }: Props) => {
           <option value="expired">expired</option>
         </select>
       </div>
-      {/* data from fetching section */}
-      {isLoading ? (
-        <div className="mt-10">
-          <p className="text-2xl text-gray-800">Loading...</p>
-        </div>
-      ) : isError ? (
-        <div className="mt-10">
-          <p className="text-2xl text-red-500">{error.message}</p>
-        </div>
-      ) : currItems && currItems.length ? (
+      {currItems && currItems.length ? (
         <div className=" mt-10 grid grid-cols-1 lg:grid-cols-2 2xl:grid-cols-3 gap-6">
           {currItems.map((item) => {
             return (
