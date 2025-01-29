@@ -1,18 +1,17 @@
 import { Link, useNavigate } from "react-router-dom";
 import searchIcon from "../../assets/search_icon.png";
 import { useState } from "react";
+import useSearchQuery from "../../stores/useSearchQuery";
 
-// define props type
-interface Props {
-  setSearchQuery: (query: string) => void;
-}
-
-const NavBar = ({ setSearchQuery }: Props) => {
+const NavBar = () => {
   // useNavigate for manual channge route
   const navigate = useNavigate();
 
   // create local state
   const [searchInput, setSearchInput] = useState("");
+
+  // import setSearchQuery funtion
+  const { setSearchQuery } = useSearchQuery();
 
   // update seach query when click search buttom
   const handleSearch = () => {
