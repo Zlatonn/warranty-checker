@@ -3,6 +3,7 @@ import { useGetItems } from "../hooks/useApi";
 import { AxiosError } from "axios";
 
 import Item from "../components/item/Item";
+import useSearchQuery from "../stores/useSearchQuery";
 
 // Define items type
 interface Items {
@@ -15,17 +16,15 @@ interface Items {
   isWarranty: "warranty" | "nearExpire" | "expired";
 }
 
-// Define props type
-interface Props {
-  searchQuery: string;
-}
-
-const ItemList = ({ searchQuery }: Props) => {
+const ItemList = () => {
   // Fetch items using useGetItems()
   const { data: items, isLoading, isError, error } = useGetItems();
 
   // Create state for select display
   const [selectDisplay, setSelectDisplay] = useState("all");
+
+  // import searchQuery state
+  const { searchQuery } = useSearchQuery();
 
   // Create state for currItems
   const [currItems, setCurrItems] = useState<Items[]>([]);
