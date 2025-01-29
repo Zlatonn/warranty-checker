@@ -1,6 +1,8 @@
 import express, { Request, Response } from "express";
 import bodyParser from "body-parser";
 import cors from "cors";
+import bcrypt from "bcrypt";
+import jwt from "jsonwebtoken";
 
 const app = express();
 const PORT = 8000;
@@ -10,6 +12,10 @@ app.use(bodyParser.json());
 
 // use cors to allow all domain
 app.use(cors());
+
+/**
+ * Items manangement
+ */
 
 // define type items
 interface Iitems {
@@ -230,6 +236,107 @@ app.delete("/item/:id", (req: Request, res: Response) => {
     });
   } catch (error) {
     console.error("Error deleting item:", error);
+    res.status(500).json({ error: "Internal server error" });
+  }
+});
+
+/**
+ * Users manangement
+ */
+
+// define type user
+interface Iuser {
+  username: string;
+  password: string;
+}
+
+// declare jwt signature key
+const secret = "mysecret";
+
+const users: Iuser[] = [];
+/** ---------- PATH => get users ---------- */
+app.get("/users", (req: Request, res: Response) => {
+  try {
+    const authHeader = req.headers["authorization"];
+    const authToken = authHeader && authHeader.split(" ")[1];
+
+    // check no have token
+    if (!authToken) {
+      res.status(401).json({ error: "No token provided" });
+      return;
+    }
+
+    // check token invalid or expired
+    let currUser;
+    try {
+      currUser = jwt.verify(authToken, secret) as jwt.JwtPayload;
+    } catch (error) {
+      res.status(401).json({ error: "Invalid or expired token" });
+      return;
+    }
+
+    // check user in db
+    const checkUser = users.find((user) => user.username === currUser.username);
+    if (!checkUser) {
+      res.status(404).json({ error: "Invalid or expired token" });
+      return;
+    }
+
+    res.status(200).json(users);
+  } catch (error) {
+    console.error("Error get users:", error);
+    res.status(500).json({ error: "Internal server error" });
+  }
+});
+
+/** ---------- PATH => register user ---------- */
+app.post("/register", async (req: Request, res: Response) => {
+  try {
+    // get data from body
+    const { username, password } = req.body;
+
+    // password hash function
+    const passwordHash = await bcrypt.hash(password, 10);
+
+    const userData = {
+      username,
+      password: passwordHash,
+    };
+
+    // check already exists user
+    const existingUser = users.find((user) => user.username === userData.username);
+    if (existingUser) {
+      res.status(400).json({ message: "User already exists" });
+      return;
+    }
+
+    users.push(userData);
+    res.status(201).json({ message: "User registered successfully" });
+  } catch (error) {
+    console.error("Error register user:", error);
+    res.status(500).json({ error: "Internal server error" });
+  }
+});
+
+/** ---------- PATH => login user ---------- */
+app.post("/login", async (req: Request, res: Response) => {
+  try {
+    const { username, password } = req.body;
+
+    // check user
+    const user = users.find((user) => user.username === username);
+
+    // if find user => check compare password
+    if (!user || !(await bcrypt.compare(password, user.password))) {
+      res.status(400).json({ message: "Invalid username or password" });
+      return;
+    }
+
+    // create jwt token using username
+    const token = jwt.sign({ username }, secret, { expiresIn: "1h" });
+    res.status(200).json({ message: "Login successful", token });
+  } catch (error) {
+    console.log("Error log in:", error);
     res.status(500).json({ error: "Internal server error" });
   }
 });
