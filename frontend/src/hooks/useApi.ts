@@ -1,6 +1,10 @@
 import { useMutation, useQuery } from "@tanstack/react-query";
 import axios from "axios";
 
+/**
+ * Item api
+ */
+
 // define type form
 interface Item {
   itemName: string;
@@ -48,7 +52,8 @@ export const useCreateItem = () => {
   return useMutation({
     mutationKey: ["createItem"],
     mutationFn: async (newItem: Item) => {
-      return await axiosClient.post(`/create`, newItem);
+      const response = await axiosClient.post(`/create`, newItem);
+      return response.data;
     },
   });
 };
@@ -56,9 +61,10 @@ export const useCreateItem = () => {
 // fetch update item
 export const useUpdateItem = (id: string) => {
   return useMutation({
-    mutationKey: ["UpdateItem", id],
+    mutationKey: ["updateItem", id],
     mutationFn: async (newItem: Item) => {
-      return await axiosClient.put(`/item/${id}`, newItem);
+      const response = await axiosClient.put(`/item/${id}`, newItem);
+      return response.data;
     },
   });
 };
@@ -66,9 +72,47 @@ export const useUpdateItem = (id: string) => {
 // fetch delete item
 export const useDeleteItem = (id: string) => {
   return useMutation({
-    mutationKey: ["DeleteItem", id],
+    mutationKey: ["deleteItem", id],
     mutationFn: async () => {
-      return await axiosClient.delete(`/item/${id}`);
+      const response = await axiosClient.delete(`/item/${id}`);
+      return response.data;
+    },
+  });
+};
+
+/**
+ * User api
+ */
+
+interface Register {
+  email: string;
+  username: string;
+  password: string;
+}
+
+interface Login {
+  username: string;
+  password: string;
+}
+
+// fetch register user
+export const useRegister = () => {
+  return useMutation({
+    mutationKey: ["register"],
+    mutationFn: async (userInfo: Register) => {
+      const response = await axiosClient.post(`/register`, userInfo);
+      return response.data;
+    },
+  });
+};
+
+// fetch register user
+export const useLogin = () => {
+  return useMutation({
+    mutationKey: ["login"],
+    mutationFn: async (user: Login) => {
+      const response = await axiosClient.post(`/login`, user);
+      return response.data;
     },
   });
 };
