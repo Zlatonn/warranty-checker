@@ -6,13 +6,13 @@ import { useLogin } from "../hooks/useApi";
 
 //Define type of form
 interface Iform {
-  username: string;
+  email: string;
   password: string;
 }
 
 //Define type of form error
 interface IformErrors {
-  username?: string;
+  email?: string;
   password?: string;
 }
 
@@ -21,7 +21,7 @@ const Login = () => {
   const navigate = useNavigate();
   // Create form login
   const [formData, setFormData] = useState<Iform>({
-    username: "",
+    email: "",
     password: "",
   });
 
@@ -43,7 +43,7 @@ const Login = () => {
   // Function valid form
   const validForm = (body: Iform) => {
     const validErrors: IformErrors = {};
-    if (!body.username) validErrors.username = "*** Username is required ***";
+    if (!body.email) validErrors.email = "*** Username is required ***";
     if (!body.password) validErrors.password = "*** Password end date is required ***";
 
     return validErrors;
@@ -86,16 +86,16 @@ const Login = () => {
           </h1>
           <div className="flex flex-col gap-3 sm:gap-5">
             <div className="flex flex-col gap-1 text-left">
-              <p className="text-gray-800">Username</p>
+              <p className="text-gray-800">Email</p>
               <input
                 type="text"
-                name="username"
-                value={formData.username}
+                name="email"
+                value={formData.email}
                 onChange={handleInputChange}
-                placeholder="Username"
+                placeholder="Email"
                 className="input input-bordered w-full h-10"
               />
-              {errors.username && <p className="w-fit mt-1 text-red-500 text-xs">{errors.username}</p>}
+              {errors.email && <p className="w-fit mt-1 text-red-500 text-xs">{errors.email}</p>}
             </div>
             <div className="flex flex-col gap-1 text-left">
               <p className="text-gray-800">Password</p>

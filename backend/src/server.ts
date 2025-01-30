@@ -251,6 +251,7 @@ app.delete("/item/:id", (req: Request, res: Response) => {
 
 // define type user
 interface Iuser {
+  email: string;
   username: string;
   password: string;
 }
@@ -281,7 +282,7 @@ app.get("/users", (req: Request, res: Response) => {
     }
 
     // check user in db
-    const checkUser = users.find((user) => user.username === currUser.username);
+    const checkUser = users.find((user) => user.email === currUser.email);
     if (!checkUser) {
       res.status(404).json({ error: "Invalid or expired token" });
       return;
@@ -298,18 +299,19 @@ app.get("/users", (req: Request, res: Response) => {
 app.post("/register", async (req: Request, res: Response) => {
   try {
     // get data from body
-    const { username, password } = req.body;
+    const { email, username, password } = req.body;
 
     // password hash function
     const passwordHash = await bcrypt.hash(password, 10);
 
     const userData = {
+      email,
       username,
       password: passwordHash,
     };
 
     // check already exists user
-    const existingUser = users.find((user) => user.username === userData.username);
+    const existingUser = users.find((user) => user.email === userData.email || user.username === userData.username);
     if (existingUser) {
       res.status(400).json({ message: "User already exists" });
       return;
@@ -326,10 +328,10 @@ app.post("/register", async (req: Request, res: Response) => {
 /** ---------- PATH => login user ---------- */
 app.post("/login", async (req: Request, res: Response) => {
   try {
-    const { username, password } = req.body;
+    const { email, password } = req.body;
 
     // check user
-    const user = users.find((user) => user.username === username);
+    const user = users.find((user) => user.email === email);
 
     // if find user => check compare password
     if (!user || !(await bcrypt.compare(password, user.password))) {
@@ -338,7 +340,7 @@ app.post("/login", async (req: Request, res: Response) => {
     }
 
     // create jwt token using username
-    const token = jwt.sign({ username }, secret, { expiresIn: "1h" });
+    const token = jwt.sign({ email }, secret, { expiresIn: "1h" });
     res.status(200).json({ message: "Login successful", token });
   } catch (error) {
     console.log("Error log in:", error);
