@@ -2,6 +2,7 @@ import { Link } from "react-router-dom";
 import { ChangeEvent, useState } from "react";
 
 import bgLogin from "../assets/bg_login.jpg";
+import { useLogin } from "../hooks/useApi";
 
 //Define type of form
 interface Iform {
@@ -25,6 +26,9 @@ const Login = () => {
   // Create state errors
   const [errors, setErrors] = useState<IformErrors>({});
 
+  // Fetch register user using userRegister
+  const { mutateAsync: loingUser } = useLogin();
+
   // Function handle input change
   const handleInputChange = (e: ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
@@ -44,13 +48,23 @@ const Login = () => {
   };
 
   // Function handle submit
-  const handleSubmit = () => {
+  const handleSubmit = async () => {
     const invalid: IformErrors = validForm(formData);
     setErrors(invalid);
     if (Object.keys(invalid).length === 0) {
-      console.log(formData);
+      try {
+        const data = await loingUser(formData);
+        if (data.token) {
+          localStorage.setItem("token", data.token);
+        }
+        alert("You has been successfully loged in. ✅");
+      } catch (error) {
+        console.error("Error login:", error);
+        alert("Failed to login. Please try again later. ❌");
+      }
     }
   };
+
   return (
     <div
       className="hero min-h-screen relative"
