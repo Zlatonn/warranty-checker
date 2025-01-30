@@ -1,8 +1,56 @@
 import { Link } from "react-router-dom";
+import { ChangeEvent, useState } from "react";
 
 import bgLogin from "../assets/bg_login.jpg";
 
+//Define type of form
+interface Iform {
+  username: string;
+  password: string;
+}
+
+//Define type of form error
+interface IformErrors {
+  username?: string;
+  password?: string;
+}
+
 const Login = () => {
+  // Create form login
+  const [formData, setFormData] = useState<Iform>({
+    username: "",
+    password: "",
+  });
+
+  // Create state errors
+  const [errors, setErrors] = useState<IformErrors>({});
+
+  // Function handle input change
+  const handleInputChange = (e: ChangeEvent<HTMLInputElement>) => {
+    const { name, value } = e.target;
+    setFormData((prev) => ({
+      ...prev,
+      [name]: value,
+    }));
+  };
+
+  // Function valid form
+  const validForm = (body: Iform) => {
+    const validErrors: IformErrors = {};
+    if (!body.username) validErrors.username = "*** Username is required ***";
+    if (!body.password) validErrors.password = "*** Password end date is required ***";
+
+    return validErrors;
+  };
+
+  // Function handle submit
+  const handleSubmit = () => {
+    const invalid: IformErrors = validForm(formData);
+    setErrors(invalid);
+    if (Object.keys(invalid).length === 0) {
+      console.log(formData);
+    }
+  };
   return (
     <div
       className="hero min-h-screen relative"
@@ -22,13 +70,31 @@ const Login = () => {
           <div className="flex flex-col gap-3 sm:gap-5">
             <div className="flex flex-col gap-1 text-left">
               <p className="text-gray-800">Username</p>
-              <input type="text" placeholder="Username" className="input input-bordered w-full h-10" />
+              <input
+                type="text"
+                name="username"
+                value={formData.username}
+                onChange={handleInputChange}
+                placeholder="Username"
+                className="input input-bordered w-full h-10"
+              />
+              {errors.username && <p className="w-fit mt-1 text-red-500 text-xs">{errors.username}</p>}
             </div>
             <div className="flex flex-col gap-1 text-left">
               <p className="text-gray-800">Password</p>
-              <input type="password" placeholder="Password" className="input input-bordered w-full h-10" />
+              <input
+                type="password"
+                name="password"
+                value={formData.password}
+                onChange={handleInputChange}
+                placeholder="Password"
+                className="input input-bordered w-full h-10"
+              />
+              {errors.password && <p className="w-fit mt-1 text-red-500 text-xs">{errors.password}</p>}
             </div>
-            <button className="w-full my-3 bg-green-600 text-white py-3 rounded-lg hover:opacity-80">Sign in</button>
+            <button onClick={handleSubmit} className="w-full my-3 bg-green-600 text-white py-3 rounded-lg hover:opacity-80">
+              Sign in
+            </button>
             <p className="text-xs sm:text-sm text-gray-500">
               New to Warranty Checker?
               <Link to="/register">
