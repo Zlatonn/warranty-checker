@@ -93,7 +93,7 @@ const ItemForm = () => {
         try {
           await createItem(formData);
           alert("The item has been successfully created. ✅");
-          navigate("/");
+          navigate("/items");
         } catch (error) {
           console.error("Error post item:", error);
           alert("Failed to create the item. Please try again later. ❌");
@@ -104,7 +104,7 @@ const ItemForm = () => {
       try {
         await updateItem(formData);
         alert("The item has been successfully updated. ✅");
-        navigate("/");
+        navigate("/items");
       } catch (error) {
         console.error("Error put item:", error);
         alert("Failed to update the item. Please try again later. ❌");
@@ -121,7 +121,7 @@ const ItemForm = () => {
     try {
       await deleteItem();
       alert("The item has been successfully deleted. ✅");
-      navigate("/");
+      navigate("/items");
     } catch (error) {
       console.error("Error delete item:", error);
       alert("Failed to delete the item. Please try again later. ❌");
@@ -251,7 +251,7 @@ const ItemForm = () => {
             </div>
           </div>
           <div className="mt-10 flex justify-end gap-3">
-            <Link to="/">
+            <Link to="/items">
               <button className="btn p-2 w-24 bg-[#d9d9d9] rounded-lg">Back</button>
             </Link>
             {!itemId ? (
