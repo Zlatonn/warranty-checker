@@ -185,11 +185,16 @@ app.put("/item/:id", (req: Request, res: Response) => {
       return;
     }
 
+    // update warranty item
+    const { daysLeft, isWarranty } = checkWanrranty(body.endDate);
+
     // update item
     updateItem.itemName = body.itemName;
     updateItem.serialNumber = body.serialNumber;
     updateItem.endDate = body.endDate;
     updateItem.notes = body.notes;
+    updateItem.remainDays = daysLeft;
+    updateItem.isWarranty = isWarranty;
 
     // response command
     res.status(200).json({
