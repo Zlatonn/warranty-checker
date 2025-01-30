@@ -130,33 +130,35 @@ const ItemForm = () => {
   // Return JSX with loading condition
   if (isLoading) {
     return (
-      <div className="py-5 flex flex-col gap-5 lg:px-40">
-        <div className="skeleton h-8 w-1/4"></div>
-        <div className="skeleton h-4 w-full"></div>
-        <div className="skeleton h-4 w-full"></div>
-        <hr />
-        <div className="flex flex-col gap-8">
-          <div className="flex flex-col gap-3">
-            <div className="skeleton h-4 w-1/6"></div>
-            <div className="skeleton h-6 w-1/4"></div>
+      <div className="container mx-auto py-10 px-10 sm:px-15 lg:px-20">
+        <div className="py-5 flex flex-col gap-5 lg:px-40">
+          <div className="skeleton h-8 w-1/4"></div>
+          <div className="skeleton h-4 w-full"></div>
+          <div className="skeleton h-4 w-full"></div>
+          <hr />
+          <div className="flex flex-col gap-8">
+            <div className="flex flex-col gap-3">
+              <div className="skeleton h-4 w-1/6"></div>
+              <div className="skeleton h-6 w-1/4"></div>
+            </div>
+            <div className="flex flex-col gap-3">
+              <div className="skeleton h-4 w-1/6"></div>
+              <div className="skeleton h-6 w-1/4"></div>
+            </div>
+            <div className="flex flex-col gap-3">
+              <div className="skeleton h-4 w-1/6"></div>
+              <div className="skeleton h-6 w-1/4"></div>
+            </div>
+            <div className="flex flex-col gap-3">
+              <div className="skeleton h-4 w-1/6"></div>
+              <div className="skeleton h-20 w-full"></div>
+            </div>
           </div>
-          <div className="flex flex-col gap-3">
-            <div className="skeleton h-4 w-1/6"></div>
-            <div className="skeleton h-6 w-1/4"></div>
+          <div className="mt-10 flex justify-end gap-3">
+            <div className="skeleton h-8 w-20"></div>
+            <div className="skeleton h-8 w-20"></div>
+            <div className="skeleton h-8 w-20"></div>
           </div>
-          <div className="flex flex-col gap-3">
-            <div className="skeleton h-4 w-1/6"></div>
-            <div className="skeleton h-6 w-1/4"></div>
-          </div>
-          <div className="flex flex-col gap-3">
-            <div className="skeleton h-4 w-1/6"></div>
-            <div className="skeleton h-20 w-full"></div>
-          </div>
-        </div>
-        <div className="mt-10 flex justify-end gap-3">
-          <div className="skeleton h-8 w-20"></div>
-          <div className="skeleton h-8 w-20"></div>
-          <div className="skeleton h-8 w-20"></div>
         </div>
       </div>
     );
@@ -179,85 +181,87 @@ const ItemForm = () => {
 
   // Return JSX with normal condition
   return (
-    <div className="py-5 flex flex-col gap-5 lg:px-40">
-      <div className="flex flex-col gap-5">
-        <h1 className="text-2xl font-bold text-gray-800">{!itemId ? "Create new item" : "Edit item"}</h1>
-        <p className="text-gray-500 text-sm lg:text-md">
-          {!itemId
-            ? "This feature allows users to add a new item to the system. You can input the item's details such as name, serial number, warranty end date, and any additional notes. Once submitted, the item will be saved and displayed in the item list for tracking."
-            : "This feature enables users to update the details of an existing item. You can modify the item's name, serial number, warranty information, or notes. This ensures that item details remain accurate and up to date in the system."}
-        </p>
+    <div className="container mx-auto py-10 px-10 sm:px-15 lg:px-20">
+      <div className="py-5 flex flex-col gap-5 lg:px-40">
+        <div className="flex flex-col gap-5">
+          <h1 className="text-2xl font-bold text-gray-800">{!itemId ? "Create new item" : "Edit item"}</h1>
+          <p className="text-gray-500 text-sm lg:text-md">
+            {!itemId
+              ? "This feature allows users to add a new item to the system. You can input the item's details such as name, serial number, warranty end date, and any additional notes. Once submitted, the item will be saved and displayed in the item list for tracking."
+              : "This feature enables users to update the details of an existing item. You can modify the item's name, serial number, warranty information, or notes. This ensures that item details remain accurate and up to date in the system."}
+          </p>
 
-        <hr />
-      </div>
-      <div className="flex flex-col gap-8 text-gray-500">
-        <div className="flex flex-col gap-1">
-          <p className="font-semibold text-gray-800">Item name</p>
-          <input
-            type="text"
-            placeholder="type item name..."
-            name="itemName"
-            value={formData?.itemName}
-            onChange={handleInputChange}
-            className="input input-bordered w-full max-w-xs h-10"
-          />
-          {errors.itemName && <p className="w-fit mt-1 text-red-500 text-sm">{errors.itemName}</p>}
+          <hr />
         </div>
-        <div className="flex flex-col gap-1">
-          <p className="font-semibold text-gray-800">Serial number</p>
-          <input
-            type="text"
-            placeholder="type serial number..."
-            name="serialNumber"
-            value={formData?.serialNumber}
-            onChange={handleInputChange}
-            className="input input-bordered w-full max-w-xs h-10"
-          />
-          {errors.serialNumber && <p className="w-fit mt-1 text-red-500 text-sm">{errors.serialNumber}</p>}
+        <div className="flex flex-col gap-8 text-gray-500">
+          <div className="flex flex-col gap-1">
+            <p className="font-semibold text-gray-800">Item name</p>
+            <input
+              type="text"
+              placeholder="type item name..."
+              name="itemName"
+              value={formData?.itemName}
+              onChange={handleInputChange}
+              className="input input-bordered w-full max-w-xs h-10"
+            />
+            {errors.itemName && <p className="w-fit mt-1 text-red-500 text-sm">{errors.itemName}</p>}
+          </div>
+          <div className="flex flex-col gap-1">
+            <p className="font-semibold text-gray-800">Serial number</p>
+            <input
+              type="text"
+              placeholder="type serial number..."
+              name="serialNumber"
+              value={formData?.serialNumber}
+              onChange={handleInputChange}
+              className="input input-bordered w-full max-w-xs h-10"
+            />
+            {errors.serialNumber && <p className="w-fit mt-1 text-red-500 text-sm">{errors.serialNumber}</p>}
+          </div>
+          <div className="flex flex-col gap-1">
+            <p className="font-semibold text-gray-800">Warranty end date</p>
+            <input
+              type="date"
+              name="endDate"
+              value={formData?.endDate}
+              onChange={handleInputChange}
+              className="input input-bordered w-full max-w-xs h-10"
+            />
+            {errors.endDate && <p className="w-fit mt-1 text-red-500 text-sm">{errors.endDate}</p>}
+          </div>
+          <div className="flex flex-col gap-1">
+            <p className="font-semibold text-gray-800">notes</p>
+            <textarea
+              placeholder="type notes..."
+              name="notes"
+              value={formData?.notes}
+              onChange={handleInputChange}
+              className="textarea textarea-bordered"
+            />
+            {errors.notes && <p className="w-fit mt-1 text-red-500 text-sm">{errors.notes}</p>}
+          </div>
         </div>
-        <div className="flex flex-col gap-1">
-          <p className="font-semibold text-gray-800">Warranty end date</p>
-          <input
-            type="date"
-            name="endDate"
-            value={formData?.endDate}
-            onChange={handleInputChange}
-            className="input input-bordered w-full max-w-xs h-10"
-          />
-          {errors.endDate && <p className="w-fit mt-1 text-red-500 text-sm">{errors.endDate}</p>}
+        <div className="mt-10 flex justify-end gap-3">
+          <Link to="/">
+            <button className="btn p-2 w-24 bg-[#d9d9d9] rounded-lg">Back</button>
+          </Link>
+          {!itemId ? (
+            <>
+              <button onClick={handleSubmit} className="btn p-2 w-24 bg-green-500 rounded-lg text-white">
+                Create
+              </button>
+            </>
+          ) : (
+            <>
+              <button onClick={handleDelete} className="btn p-2 w-24 bg-red-500 rounded-lg  text-white">
+                Delete
+              </button>
+              <button onClick={handleSubmit} className="btn p-2 w-24 bg-blue-500 rounded-lg text-white">
+                Edit
+              </button>
+            </>
+          )}
         </div>
-        <div className="flex flex-col gap-1">
-          <p className="font-semibold text-gray-800">notes</p>
-          <textarea
-            placeholder="type notes..."
-            name="notes"
-            value={formData?.notes}
-            onChange={handleInputChange}
-            className="textarea textarea-bordered"
-          />
-          {errors.notes && <p className="w-fit mt-1 text-red-500 text-sm">{errors.notes}</p>}
-        </div>
-      </div>
-      <div className="mt-10 flex justify-end gap-3">
-        <Link to="/">
-          <button className="btn p-2 w-24 bg-[#d9d9d9] rounded-lg">Back</button>
-        </Link>
-        {!itemId ? (
-          <>
-            <button onClick={handleSubmit} className="btn p-2 w-24 bg-green-500 rounded-lg text-white">
-              Create
-            </button>
-          </>
-        ) : (
-          <>
-            <button onClick={handleDelete} className="btn p-2 w-24 bg-red-500 rounded-lg  text-white">
-              Delete
-            </button>
-            <button onClick={handleSubmit} className="btn p-2 w-24 bg-blue-500 rounded-lg text-white">
-              Edit
-            </button>
-          </>
-        )}
       </div>
     </div>
   );
