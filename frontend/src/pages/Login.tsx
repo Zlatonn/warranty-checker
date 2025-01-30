@@ -1,4 +1,4 @@
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { ChangeEvent, useState } from "react";
 
 import bgLogin from "../assets/bg_login.jpg";
@@ -17,6 +17,8 @@ interface IformErrors {
 }
 
 const Login = () => {
+  // useNavigate for manual change route
+  const navigate = useNavigate();
   // Create form login
   const [formData, setFormData] = useState<Iform>({
     username: "",
@@ -57,6 +59,7 @@ const Login = () => {
         if (data.token) {
           localStorage.setItem("token", data.token);
         }
+        navigate("/items");
         alert("You has been successfully loged in. ✅");
       } catch (error) {
         console.error("Error login:", error);
