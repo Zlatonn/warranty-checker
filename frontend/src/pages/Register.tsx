@@ -1,7 +1,8 @@
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { ChangeEvent, useState } from "react";
 
 import bgUser from "../assets/bg_register.jpg";
+import { useRegister } from "../hooks/useApi";
 
 //Define type of form
 interface Iform {
@@ -18,6 +19,9 @@ interface IformErrors {
 }
 
 const Register = () => {
+  // useNavigate for manual change route
+  const navigate = useNavigate();
+
   // Create form register
   const [formData, setFormData] = useState<Iform>({
     email: "",
@@ -27,6 +31,9 @@ const Register = () => {
 
   // Create state errors
   const [errors, setErrors] = useState<IformErrors>({});
+
+  // Fetch register user using userRegister
+  const { mutateAsync: registerUser } = useRegister();
 
   // Function handle input change
   const handleInputChange = (e: ChangeEvent<HTMLInputElement>) => {
@@ -48,11 +55,18 @@ const Register = () => {
   };
 
   // Function handle submit
-  const handleSubmit = () => {
+  const handleSubmit = async () => {
     const invalid: IformErrors = validForm(formData);
     setErrors(invalid);
     if (Object.keys(invalid).length === 0) {
-      console.log(formData);
+      try {
+        await registerUser(formData);
+        alert("You has been successfully registerd. ✅");
+        navigate("/login");
+      } catch (error) {
+        console.error("Error register:", error);
+        alert("Failed to register user. Please try again later. ❌");
+      }
     }
   };
 
