@@ -70,9 +70,43 @@ const checkWanrranty = (date: string) => {
   return { daysLeft, isWarranty };
 };
 
+// check validToken
+const validToken = (req: Request): boolean => {
+  const authHeader = req.headers["authorization"];
+  const authToken = authHeader && authHeader.split(" ")[1];
+
+  // check no have token
+  if (!authToken) {
+    return false;
+  }
+
+  // check token invalid or expired
+  try {
+    const currUser = jwt.verify(authToken, secret) as jwt.JwtPayload;
+
+    // check user in db
+    const checkUser = users.find((user) => user.email === currUser.email);
+    if (!checkUser) {
+      return false;
+    }
+  } catch (error) {
+    return false;
+  }
+
+  // if token is valid
+  return true;
+};
+
 /** ---------- PATH => get all items ---------- */
 app.get("/items", (req: Request, res: Response) => {
   try {
+    // check valid token
+    const isValidToken = validToken(req);
+    if (!isValidToken) {
+      res.status(401).json({ error: "Invalid or expired token" });
+      return;
+    }
+
     // return all items
     res.status(200).json(items);
   } catch (error) {
@@ -84,6 +118,13 @@ app.get("/items", (req: Request, res: Response) => {
 /** ---------- PATH => get specific item ---------- */
 app.get("/item/:id", (req: Request, res: Response) => {
   try {
+    // check valid token
+    const isValidToken = validToken(req);
+    if (!isValidToken) {
+      res.status(401).json({ error: "Invalid or expired token" });
+      return;
+    }
+
     // get id from params
     const getId: number = parseInt(req.params.id);
 
@@ -113,6 +154,13 @@ app.get("/item/:id", (req: Request, res: Response) => {
 /** ---------- PATH => create item ---------- */
 app.post("/create", (req: Request, res: Response) => {
   try {
+    // check valid token
+    const isValidToken = validToken(req);
+    if (!isValidToken) {
+      res.status(401).json({ error: "Invalid or expired token" });
+      return;
+    }
+
     // get data from body
     const body = req.body;
 
@@ -157,6 +205,13 @@ app.post("/create", (req: Request, res: Response) => {
 /** ---------- PATH => update item ---------- */
 app.put("/item/:id", (req: Request, res: Response) => {
   try {
+    // check valid token
+    const isValidToken = validToken(req);
+    if (!isValidToken) {
+      res.status(401).json({ error: "Invalid or expired token" });
+      return;
+    }
+
     // get id from params
     const getId: number = parseInt(req.params.id);
 
@@ -210,6 +265,13 @@ app.put("/item/:id", (req: Request, res: Response) => {
 /** ---------- PATH => delete item ---------- */
 app.delete("/item/:id", (req: Request, res: Response) => {
   try {
+    // check valid token
+    const isValidToken = validToken(req);
+    if (!isValidToken) {
+      res.status(401).json({ error: "Invalid or expired token" });
+      return;
+    }
+
     // get id from params
     const getId: number = parseInt(req.params.id);
 
@@ -263,31 +325,12 @@ const users: Iuser[] = [];
 /** ---------- PATH => get users ---------- */
 app.get("/users", (req: Request, res: Response) => {
   try {
-    const authHeader = req.headers["authorization"];
-    const authToken = authHeader && authHeader.split(" ")[1];
-
-    // check no have token
-    if (!authToken) {
-      res.status(401).json({ error: "No token provided" });
-      return;
-    }
-
-    // check token invalid or expired
-    let currUser;
-    try {
-      currUser = jwt.verify(authToken, secret) as jwt.JwtPayload;
-    } catch (error) {
+    // check valid token
+    const isValidToken = validToken(req);
+    if (!isValidToken) {
       res.status(401).json({ error: "Invalid or expired token" });
       return;
     }
-
-    // check user in db
-    const checkUser = users.find((user) => user.email === currUser.email);
-    if (!checkUser) {
-      res.status(404).json({ error: "Invalid or expired token" });
-      return;
-    }
-
     res.status(200).json(users);
   } catch (error) {
     console.error("Error get users:", error);
@@ -340,7 +383,7 @@ app.post("/login", async (req: Request, res: Response) => {
     }
 
     // create jwt token using username
-    const token = jwt.sign({ email }, secret, { expiresIn: "1h" });
+    const token = jwt.sign({ email }, secret, { expiresIn: "1m" });
     res.status(200).json({ message: "Login successful", token });
   } catch (error) {
     console.log("Error log in:", error);
