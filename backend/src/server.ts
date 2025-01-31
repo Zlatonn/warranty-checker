@@ -227,7 +227,7 @@ app.put("/item/:id", (req: Request, res: Response) => {
     //check valid body
     const errors = validForm(body);
     if (errors && errors.length > 0) {
-      res.status(422).json({ errors: errors });
+      res.status(422).json({ errors: "Unprocessable Entity" });
       return;
     }
 
@@ -383,7 +383,7 @@ app.post("/login", async (req: Request, res: Response) => {
     }
 
     // create jwt token using username
-    const token = jwt.sign({ email }, secret, { expiresIn: "1m" });
+    const token = jwt.sign({ email }, secret, { expiresIn: "1h" });
     res.status(200).json({ message: "Login successful", token });
   } catch (error) {
     console.log("Error log in:", error);
