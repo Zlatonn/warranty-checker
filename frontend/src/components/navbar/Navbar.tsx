@@ -31,7 +31,7 @@ const NavBar = () => {
   // function handle log out
   const handleLogOut = () => {
     localStorage.removeItem("token");
-    navigate("/home");
+    navigate("/");
   };
 
   return (

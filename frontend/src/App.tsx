@@ -20,7 +20,7 @@ const App = () => {
         <div className="min-h-screen p-0 m-0 flex flex-col items-center">
           <Routes>
             <Route element={<PublicRoutes />}>
-              <Route path="/home" element={<Home />} />
+              <Route path="/" element={<Home />} />
               <Route path="/register" element={<Register />} />
               <Route path="/login" element={<Login />} />
             </Route>
