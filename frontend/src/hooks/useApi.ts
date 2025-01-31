@@ -24,12 +24,22 @@ const axiosClient = axios.create({
   },
 });
 
+// fucntion get authorization header
+const getAuthorHeader = () => {
+  const token = localStorage.getItem("token");
+  return {
+    headers: {
+      Authorization: `Bearer ${token}`,
+    },
+  };
+};
+
 // fetch get all items
 export const useGetItems = () => {
   return useQuery({
     queryKey: ["items"],
     queryFn: async () => {
-      const response = await axiosClient.get(`/items`);
+      const response = await axiosClient.get(`/items`, getAuthorHeader());
       return response.data;
     },
   });
@@ -40,7 +50,7 @@ export const useGetItem = (id: string) => {
   return useQuery({
     queryKey: ["item", id],
     queryFn: async () => {
-      const response = await axiosClient.get(`/item/${id}`);
+      const response = await axiosClient.get(`/item/${id}`, getAuthorHeader());
       return response.data;
     },
     enabled: !!id,
@@ -52,7 +62,7 @@ export const useCreateItem = () => {
   return useMutation({
     mutationKey: ["createItem"],
     mutationFn: async (newItem: Item) => {
-      const response = await axiosClient.post(`/create`, newItem);
+      const response = await axiosClient.post(`/create`, newItem, getAuthorHeader());
       return response.data;
     },
   });
@@ -63,7 +73,7 @@ export const useUpdateItem = (id: string) => {
   return useMutation({
     mutationKey: ["updateItem", id],
     mutationFn: async (newItem: Item) => {
-      const response = await axiosClient.put(`/item/${id}`, newItem);
+      const response = await axiosClient.put(`/item/${id}`, newItem, getAuthorHeader());
       return response.data;
     },
   });
@@ -74,7 +84,7 @@ export const useDeleteItem = (id: string) => {
   return useMutation({
     mutationKey: ["deleteItem", id],
     mutationFn: async () => {
-      const response = await axiosClient.delete(`/item/${id}`);
+      const response = await axiosClient.delete(`/item/${id}`, getAuthorHeader());
       return response.data;
     },
   });
