@@ -1,8 +1,14 @@
-import { Link, useNavigate } from "react-router-dom";
+import { Link } from "react-router-dom";
 import { ChangeEvent, useState } from "react";
 
-import bgUser from "../assets/bg_register.jpg";
 import { useRegister } from "../hooks/useApi";
+
+import ErrorNetwork from "../components/error/ErrorNetwork";
+import Error404 from "../components/error/Error404";
+import Error500 from "../components/error/Error500";
+import ErrorUnexpected from "../components/error/ErrorUnexpected";
+
+import bgUser from "../assets/bg_register.jpg";
 
 //Define type of form
 interface Iform {
@@ -19,21 +25,21 @@ interface IformErrors {
 }
 
 const Register = () => {
-  // useNavigate for manual change route
-  const navigate = useNavigate();
-
-  // Create form register
+  // Create state form register
   const [formData, setFormData] = useState<Iform>({
     email: "",
     username: "",
     password: "",
   });
 
-  // Create state errors
-  const [errors, setErrors] = useState<IformErrors>({});
+  // Create state form errors
+  const [formErrors, setFormErrors] = useState<IformErrors>({});
+
+  //Create state http status error
+  const [statusError, setStatusError] = useState<number | null>(null);
 
   // Fetch register user using userRegister
-  const { mutateAsync: registerUser } = useRegister();
+  const { mutate: registerUser } = useRegister(setStatusError);
 
   // Function handle input change
   const handleInputChange = (e: ChangeEvent<HTMLInputElement>) => {
@@ -55,21 +61,29 @@ const Register = () => {
   };
 
   // Function handle submit
-  const handleSubmit = async () => {
+  const handleSubmit = () => {
     const invalid: IformErrors = validForm(formData);
-    setErrors(invalid);
+    setFormErrors(invalid);
     if (Object.keys(invalid).length === 0) {
-      try {
-        await registerUser(formData);
-        alert("You has been successfully registerd. ✅");
-        navigate("/login");
-      } catch (error) {
-        console.error("Error register:", error);
-        alert("Failed to register user. Please try again later. ❌");
-      }
+      registerUser(formData);
     }
   };
 
+  // Return JSX with error condition
+  if (statusError !== null) {
+    switch (statusError) {
+      case 0:
+        return <ErrorNetwork />;
+      case 404:
+        return <Error404 />;
+      case 500:
+        return <Error500 />;
+      default:
+        return <ErrorUnexpected />;
+    }
+  }
+
+  //Return JSX with normal condition
   return (
     <div className="w-full min-h-screen flex flex-col lg:flex-row">
       {/* Image Section */}
@@ -110,7 +124,7 @@ const Register = () => {
                   className="input input-bordered w-full h-10"
                 />
                 <p className="text-xs text-gray-500">Please enter your email.</p>
-                {errors.email && <p className="w-fit mt-1 text-red-500 text-xs">{errors.email}</p>}
+                {formErrors.email && <p className="w-fit mt-1 text-red-500 text-xs">{formErrors.email}</p>}
               </div>
               <div className="flex flex-col gap-1 text-left">
                 <p className="font-semibold text-gray-800">
@@ -125,7 +139,7 @@ const Register = () => {
                   className="input input-bordered w-full h-10"
                 />
                 <p className="text-xs text-gray-500">Choose a unique username.</p>
-                {errors.username && <p className="w-fit mt-1 text-red-500 text-xs">{errors.username}</p>}
+                {formErrors.username && <p className="w-fit mt-1 text-red-500 text-xs">{formErrors.username}</p>}
               </div>
               <div className="flex flex-col gap-1 text-left">
                 <p className="font-semibold text-gray-800">
@@ -140,7 +154,7 @@ const Register = () => {
                   className="input input-bordered w-full h-10"
                 />
                 <p className="text-xs text-gray-500">Create a strong password.</p>
-                {errors.password && <p className="w-fit mt-1 text-red-500 text-xs">{errors.password}</p>}
+                {formErrors.password && <p className="w-fit mt-1 text-red-500 text-xs">{formErrors.password}</p>}
               </div>
             </div>
             <button onClick={handleSubmit} className="w-full my-10 bg-black text-white py-3 rounded-lg hover:shadow-lg">
