@@ -1,7 +1,9 @@
 import { Link, useNavigate } from "react-router-dom";
-import searchIcon from "../../assets/search_icon.png";
 import { useState } from "react";
 import useSearchQuery from "../../stores/useSearchQuery";
+
+import searchIcon from "../../assets/search_icon.png";
+import userIcon from "../../assets/user-regular.svg";
 
 const NavBar = () => {
   // useNavigate for manual channge route
@@ -24,6 +26,12 @@ const NavBar = () => {
     if (event.key === "Enter") {
       handleSearch();
     }
+  };
+
+  // function handle log out
+  const handleLogOut = () => {
+    localStorage.removeItem("token");
+    navigate("/");
   };
 
   return (
@@ -64,6 +72,20 @@ const NavBar = () => {
               +
             </button>
           </Link>
+          <div className="dropdown dropdown-bottom dropdown-end">
+            <div
+              tabIndex={0}
+              role="button"
+              className="w-10 h-10 p-3 flex justify-center items-center bg-white rounded-full border-[1px] cursor-pointer hover:bg-gray-100"
+            >
+              <img src={userIcon} alt="user-icon" className="object-cover" />
+            </div>
+            <ul tabIndex={0} className="dropdown-content menu mt-2 bg-base-100 rounded-box z-[1] w-32 p-2 shadow">
+              <li onClick={handleLogOut}>
+                <a>Log Out</a>
+              </li>
+            </ul>
+          </div>
         </div>
       </div>
     </div>

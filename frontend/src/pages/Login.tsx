@@ -1,29 +1,42 @@
 import { Link } from "react-router-dom";
 import { ChangeEvent, useState } from "react";
 
+import { useLogin } from "../hooks/useApi";
+
+import Error404 from "../components/error/Error404";
+import Error500 from "../components/error/Error500";
+import ErrorNetwork from "../components/error/ErrorNetwork";
+import ErrorUnexpected from "../components/error/ErrorUnexpected";
+
 import bgLogin from "../assets/bg_login.jpg";
 
 //Define type of form
 interface Iform {
-  username: string;
+  email: string;
   password: string;
 }
 
 //Define type of form error
 interface IformErrors {
-  username?: string;
+  email?: string;
   password?: string;
 }
 
 const Login = () => {
   // Create form login
   const [formData, setFormData] = useState<Iform>({
-    username: "",
+    email: "",
     password: "",
   });
 
   // Create state errors
-  const [errors, setErrors] = useState<IformErrors>({});
+  const [formErrors, setFormErrors] = useState<IformErrors>({});
+
+  //Create state http status error
+  const [statusError, setStatusError] = useState<number | null>(null);
+
+  // Fetch register user using userRegister
+  const { mutate: loingUser } = useLogin(setStatusError);
 
   // Function handle input change
   const handleInputChange = (e: ChangeEvent<HTMLInputElement>) => {
@@ -37,7 +50,7 @@ const Login = () => {
   // Function valid form
   const validForm = (body: Iform) => {
     const validErrors: IformErrors = {};
-    if (!body.username) validErrors.username = "*** Username is required ***";
+    if (!body.email) validErrors.email = "*** Username is required ***";
     if (!body.password) validErrors.password = "*** Password end date is required ***";
 
     return validErrors;
@@ -46,11 +59,27 @@ const Login = () => {
   // Function handle submit
   const handleSubmit = () => {
     const invalid: IformErrors = validForm(formData);
-    setErrors(invalid);
+    setFormErrors(invalid);
     if (Object.keys(invalid).length === 0) {
-      console.log(formData);
+      loingUser(formData);
     }
   };
+
+  // Return JSX with error condition
+  if (statusError !== null) {
+    switch (statusError) {
+      case 0:
+        return <ErrorNetwork />;
+      case 404:
+        return <Error404 />;
+      case 500:
+        return <Error500 />;
+      default:
+        return <ErrorUnexpected />;
+    }
+  }
+
+  //Return JSX with normal condition
   return (
     <div
       className="hero min-h-screen relative"
@@ -69,16 +98,16 @@ const Login = () => {
           </h1>
           <div className="flex flex-col gap-3 sm:gap-5">
             <div className="flex flex-col gap-1 text-left">
-              <p className="text-gray-800">Username</p>
+              <p className="text-gray-800">Email</p>
               <input
                 type="text"
-                name="username"
-                value={formData.username}
+                name="email"
+                value={formData.email}
                 onChange={handleInputChange}
-                placeholder="Username"
+                placeholder="Email"
                 className="input input-bordered w-full h-10"
               />
-              {errors.username && <p className="w-fit mt-1 text-red-500 text-xs">{errors.username}</p>}
+              {formErrors.email && <p className="w-fit mt-1 text-red-500 text-xs">{formErrors.email}</p>}
             </div>
             <div className="flex flex-col gap-1 text-left">
               <p className="text-gray-800">Password</p>
@@ -90,7 +119,7 @@ const Login = () => {
                 placeholder="Password"
                 className="input input-bordered w-full h-10"
               />
-              {errors.password && <p className="w-fit mt-1 text-red-500 text-xs">{errors.password}</p>}
+              {formErrors.password && <p className="w-fit mt-1 text-red-500 text-xs">{formErrors.password}</p>}
             </div>
             <button onClick={handleSubmit} className="w-full my-3 bg-green-600 text-white py-3 rounded-lg hover:opacity-80">
               Sign in
