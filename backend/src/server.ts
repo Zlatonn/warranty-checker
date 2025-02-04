@@ -4,20 +4,150 @@ import cors from "cors";
 import bcrypt from "bcrypt";
 import jwt from "jsonwebtoken";
 
+// Create an Express application
 const app = express();
+
+// Define the port for the server
 const PORT = 8000;
 
-// use bodatParser for path post
+// Use body Parser for path post
 app.use(bodyParser.json());
 
-// use cors to allow all domain
+// Use cors to allow all domain
 app.use(cors());
 
 /**
- * Items manangement
+ *
+ * Users manangement
+ *
  */
 
-// define type items
+// Define type user
+interface Iuser {
+  email: string;
+  username: string;
+  password: string;
+}
+
+// Declare my jwt signature key
+const secret = "mysecret";
+
+// Store users
+const users: Iuser[] = [];
+
+// Check validToken function (if have token => true / haven't token => false)
+const validToken = (req: Request): boolean => {
+  // Get token in headers
+  const authHeader = req.headers["authorization"];
+  const authToken = authHeader && authHeader.split(" ")[1];
+
+  // Check no have token
+  if (!authToken) {
+    return false;
+  }
+
+  // Try to check token
+  try {
+    // Verify token invalid or expired
+    const currUser = jwt.verify(authToken, secret) as jwt.JwtPayload;
+
+    // Check user in data base
+    const checkUser = users.find((user) => user.email === currUser.email);
+    if (!checkUser) {
+      return false;
+    }
+    // When check token error => always return false
+  } catch (error) {
+    return false;
+  }
+
+  // If have token is valid
+  return true;
+};
+
+/** ---------- PATH => get users ---------- */
+app.get("/users", (req: Request, res: Response) => {
+  try {
+    // Check valid token
+    const isValidToken = validToken(req);
+    if (!isValidToken) {
+      // Return invalid token
+      res.status(401).json({ error: "Invalid or expired token" });
+      return;
+    }
+    // Reuturn all users
+    res.status(200).json(users);
+  } catch (error) {
+    console.error("Error get users:", error);
+    res.status(500).json({ error: "Internal server error" });
+  }
+});
+
+/** ---------- PATH => register user ---------- */
+app.post("/register", async (req: Request, res: Response) => {
+  try {
+    // Get data from body
+    const { email, username, password } = req.body;
+
+    // Password hash function before push to data base
+    const passwordHash = await bcrypt.hash(password, 10);
+
+    // Declear userData
+    const userData = {
+      email,
+      username,
+      password: passwordHash,
+    };
+
+    // Check already exists user
+    const existingUser = users.find((user) => user.email === userData.email || user.username === userData.username);
+    if (existingUser) {
+      // Return user already exists
+      res.status(400).json({ message: "User already exists" });
+      return;
+    }
+
+    // Add userData to users
+    users.push(userData);
+
+    // Return registerd complete
+    res.status(201).json({ message: "User registered complete" });
+  } catch (error) {
+    console.error("Error register user:", error);
+    res.status(500).json({ error: "Internal server error" });
+  }
+});
+
+/** ---------- PATH => login user ---------- */
+app.post("/login", async (req: Request, res: Response) => {
+  try {
+    const { email, password } = req.body;
+
+    // Check user
+    const user = users.find((user) => user.email === email);
+
+    // If find user => check compare password
+    if (!user || !(await bcrypt.compare(password, user.password))) {
+      res.status(400).json({ message: "Invalid username or password" });
+      return;
+    }
+
+    // Create jwt token using username when log in success
+    const token = jwt.sign({ email }, secret, { expiresIn: "1h" });
+    res.status(200).json({ message: "Login complete", token });
+  } catch (error) {
+    console.log("Error log in:", error);
+    res.status(500).json({ error: "Internal server error" });
+  }
+});
+
+/**
+ *
+ * Items manangement
+ *
+ */
+
+// Define type items
 interface Iitems {
   id: number;
   itemName: string;
@@ -28,23 +158,28 @@ interface Iitems {
   isWarranty: "warranty" | "nearExpire" | "expired";
 }
 
-// store item list
+// Store item list
 const items: Iitems[] = [];
 
-// define initial id
+// Define initial id
 let id: number = 1;
 
-// function valid form
+// Function valid form (check blank error input and return them)
 const validForm = (body: Iitems): string[] => {
+  // Declare erros
   const errors = [];
+
+  // Check blank error 1 by 1
   if (!body.itemName) errors.push("itemName is required");
   if (!body.serialNumber) errors.push("serialNumber is required");
   if (!body.endDate) errors.push("endDate is required");
   if (!body.notes) errors.push("notes is required");
+
+  // Return errors
   return errors;
 };
 
-// function check warranty
+// Function check warranty
 const checkWanrranty = (date: string) => {
   const timeCurr = new Date();
   const timeEnd = new Date(date);
@@ -53,12 +188,17 @@ const checkWanrranty = (date: string) => {
   timeCurr.setHours(0, 0, 0, 0);
   timeEnd.setHours(0, 0, 0, 0);
 
+  // Calculate time diff
   const msDiff = timeEnd.getTime() - timeCurr.getTime();
   const dayDiff = Math.ceil(msDiff / (1000 * 60 * 60 * 24));
 
+  // Adjust dayLeft format
   const daysLeft = dayDiff >= 0 ? dayDiff + 1 : dayDiff;
+
+  // Define warranty status
   let isWarranty: "warranty" | "nearExpire" | "expired" = "warranty";
 
+  // isWaranty condition
   if (daysLeft >= 30) {
     isWarranty = "warranty";
   } else if (daysLeft >= 0 && daysLeft < 30) {
@@ -67,47 +207,21 @@ const checkWanrranty = (date: string) => {
     isWarranty = "expired";
   }
 
+  // Return dayLeft and warranty status
   return { daysLeft, isWarranty };
-};
-
-// check validToken
-const validToken = (req: Request): boolean => {
-  const authHeader = req.headers["authorization"];
-  const authToken = authHeader && authHeader.split(" ")[1];
-
-  // check no have token
-  if (!authToken) {
-    return false;
-  }
-
-  // check token invalid or expired
-  try {
-    const currUser = jwt.verify(authToken, secret) as jwt.JwtPayload;
-
-    // check user in db
-    const checkUser = users.find((user) => user.email === currUser.email);
-    if (!checkUser) {
-      return false;
-    }
-  } catch (error) {
-    return false;
-  }
-
-  // if token is valid
-  return true;
 };
 
 /** ---------- PATH => get all items ---------- */
 app.get("/items", (req: Request, res: Response) => {
   try {
-    // check valid token
+    // Check valid token
     const isValidToken = validToken(req);
     if (!isValidToken) {
+      // Return invalid token
       res.status(401).json({ error: "Invalid or expired token" });
       return;
     }
-
-    // return all items
+    // Return all items
     res.status(200).json(items);
   } catch (error) {
     console.error("Error fetching items:", error);
@@ -118,32 +232,33 @@ app.get("/items", (req: Request, res: Response) => {
 /** ---------- PATH => get specific item ---------- */
 app.get("/item/:id", (req: Request, res: Response) => {
   try {
-    // check valid token
+    // Check valid token
     const isValidToken = validToken(req);
     if (!isValidToken) {
+      // Return invalid token
       res.status(401).json({ error: "Invalid or expired token" });
       return;
     }
 
-    // get id from params
+    // Get id from params
     const getId: number = parseInt(req.params.id);
 
-    // check if id is a valid number
+    // Check if id is a valid number
     if (isNaN(getId)) {
       res.status(400).json({ error: "Invalid ID format" });
       return;
     }
 
-    // find item by id
+    // Find item by id
     const getItem = items.find((item) => item.id === getId);
 
-    // check when item not found
+    // Check when item not found
     if (!getItem) {
       res.status(404).json({ error: `Item with ID:${getId} not found` });
       return;
     }
 
-    // return specfic item
+    // Return specfic item
     res.status(200).json(getItem);
   } catch (error) {
     console.error("Error fetching item:", error);
@@ -154,27 +269,28 @@ app.get("/item/:id", (req: Request, res: Response) => {
 /** ---------- PATH => create item ---------- */
 app.post("/create", (req: Request, res: Response) => {
   try {
-    // check valid token
+    // Check valid token
     const isValidToken = validToken(req);
     if (!isValidToken) {
+      // Return invalid token
       res.status(401).json({ error: "Invalid or expired token" });
       return;
     }
 
-    // get data from body
+    // Get data from body
     const body = req.body;
 
-    //check valid body
+    //Check valid body
     const errors = validForm(body);
     if (errors && errors.length > 0) {
       res.status(422).json({ errors: errors });
       return;
     }
 
-    // check warranty item
+    // Check warranty item
     const { daysLeft, isWarranty } = checkWanrranty(body.endDate);
 
-    // manage pattern data
+    // Manage pattern data
     const newItem = {
       id: id,
       itemName: body.itemName,
@@ -185,13 +301,13 @@ app.post("/create", (req: Request, res: Response) => {
       isWarranty: isWarranty,
     };
 
-    // add new item
+    // Add new item
     items.push(newItem);
 
-    // increment id
+    // Increment id
     id += 1;
 
-    // response command
+    // Response create complete
     res.status(201).json({
       message: "create complete",
       newItem: newItem,
@@ -205,45 +321,46 @@ app.post("/create", (req: Request, res: Response) => {
 /** ---------- PATH => update item ---------- */
 app.put("/item/:id", (req: Request, res: Response) => {
   try {
-    // check valid token
+    // Check valid token
     const isValidToken = validToken(req);
     if (!isValidToken) {
+      // Return invalid token
       res.status(401).json({ error: "Invalid or expired token" });
       return;
     }
 
-    // get id from params
+    // Get id from params
     const getId: number = parseInt(req.params.id);
 
-    // check if id is a valid number
+    // Check if id is a valid number
     if (isNaN(getId)) {
       res.status(400).json({ error: "Invalid ID format" });
       return;
     }
 
-    // get data from body
+    // Get data from body
     const body = req.body;
 
-    //check valid body
+    // Check valid body
     const errors = validForm(body);
     if (errors && errors.length > 0) {
       res.status(422).json({ errors: "Unprocessable Entity" });
       return;
     }
 
-    // find update item
+    // Find update item
     const updateItem = items.find((item) => item.id === getId);
 
-    // check when item not found
+    // Check when item not found
     if (!updateItem) {
       res.status(404).json({ error: `Item with ID:${getId} not found` });
       return;
     }
 
-    // update warranty item
+    // Get update warranty item data
     const { daysLeft, isWarranty } = checkWanrranty(body.endDate);
 
-    // update item
+    // Update item
     updateItem.itemName = body.itemName;
     updateItem.serialNumber = body.serialNumber;
     updateItem.endDate = body.endDate;
@@ -251,7 +368,7 @@ app.put("/item/:id", (req: Request, res: Response) => {
     updateItem.remainDays = daysLeft;
     updateItem.isWarranty = isWarranty;
 
-    // response command
+    // Response update complete
     res.status(200).json({
       message: "update complete",
       data: updateItem,
@@ -265,128 +382,45 @@ app.put("/item/:id", (req: Request, res: Response) => {
 /** ---------- PATH => delete item ---------- */
 app.delete("/item/:id", (req: Request, res: Response) => {
   try {
-    // check valid token
+    // Check valid token
     const isValidToken = validToken(req);
     if (!isValidToken) {
+      // Return invalid token
       res.status(401).json({ error: "Invalid or expired token" });
       return;
     }
 
-    // get id from params
+    // Get id from params
     const getId: number = parseInt(req.params.id);
 
-    // check if id is a valid number
+    // Check if id is a valid number
     if (isNaN(getId)) {
       res.status(400).json({ error: "Invalid ID format" });
       return;
     }
 
-    // find delete index
+    // Find delete index
     const deleteIndex = items.findIndex((item) => item.id === getId);
 
-    // check when item not found
+    // Check when item not found
     if (deleteIndex === -1) {
       res.status(404).json({ error: `Item with ID:${getId} not found` });
       return;
     }
 
-    // buffer delete data
+    // Buffer delete data
     const deleteData = items[deleteIndex];
 
-    // delete item
+    // Delete item
     items.splice(deleteIndex, 1);
 
-    // response command
+    // Response delete complete
     res.status(200).json({
       message: "delete complete",
       data: deleteData,
     });
   } catch (error) {
     console.error("Error deleting item:", error);
-    res.status(500).json({ error: "Internal server error" });
-  }
-});
-
-/**
- * Users manangement
- */
-
-// define type user
-interface Iuser {
-  email: string;
-  username: string;
-  password: string;
-}
-
-// declare jwt signature key
-const secret = "mysecret";
-
-const users: Iuser[] = [];
-/** ---------- PATH => get users ---------- */
-app.get("/users", (req: Request, res: Response) => {
-  try {
-    // check valid token
-    const isValidToken = validToken(req);
-    if (!isValidToken) {
-      res.status(401).json({ error: "Invalid or expired token" });
-      return;
-    }
-    res.status(200).json(users);
-  } catch (error) {
-    console.error("Error get users:", error);
-    res.status(500).json({ error: "Internal server error" });
-  }
-});
-
-/** ---------- PATH => register user ---------- */
-app.post("/register", async (req: Request, res: Response) => {
-  try {
-    // get data from body
-    const { email, username, password } = req.body;
-
-    // password hash function
-    const passwordHash = await bcrypt.hash(password, 10);
-
-    const userData = {
-      email,
-      username,
-      password: passwordHash,
-    };
-
-    // check already exists user
-    const existingUser = users.find((user) => user.email === userData.email || user.username === userData.username);
-    if (existingUser) {
-      res.status(400).json({ message: "User already exists" });
-      return;
-    }
-
-    users.push(userData);
-    res.status(201).json({ message: "User registered successfully" });
-  } catch (error) {
-    console.error("Error register user:", error);
-    res.status(500).json({ error: "Internal server error" });
-  }
-});
-
-/** ---------- PATH => login user ---------- */
-app.post("/login", async (req: Request, res: Response) => {
-  try {
-    const { email, password } = req.body;
-
-    // check user
-    const user = users.find((user) => user.email === email);
-
-    // if find user => check compare password
-    if (!user || !(await bcrypt.compare(password, user.password))) {
-      res.status(400).json({ message: "Invalid username or password" });
-      return;
-    }
-
-    // create jwt token using username
-    const token = jwt.sign({ email }, secret, { expiresIn: "1h" });
-    res.status(200).json({ message: "Login successful", token });
-  } catch (error) {
-    console.log("Error log in:", error);
     res.status(500).json({ error: "Internal server error" });
   }
 });
