@@ -64,7 +64,14 @@ const ItemForm = () => {
   useEffect(() => {
     if (id) {
       setItemId(id);
-      setFormData(item);
+      if (item) {
+        setFormData({
+          itemName: item.itemName || "",
+          serialNumber: item.serialNumber || "",
+          endDate: item.endDate || "",
+          notes: item.notes || "",
+        });
+      }
     }
   }, [id, item]);
 
