@@ -1,10 +1,16 @@
 import { useEffect, useState } from "react";
 import { useGetItems } from "../hooks/useApi";
-import { AxiosError } from "axios";
+
+import useSearchQuery from "../stores/useSearchQuery";
 
 import Item from "../components/item/Item";
-import useSearchQuery from "../stores/useSearchQuery";
 import NavBar from "../components/navbar/Navbar";
+import LoadItemList from "../components/loading/LoadItemList";
+import ErrorNetwork from "../components/error/ErrorNetwork";
+import Error401 from "../components/error/Error401";
+import Error500 from "../components/error/Error500";
+import ErrorUnexpected from "../components/error/ErrorUnexpected";
+import Error404 from "../components/error/Error404";
 
 // Define items type
 interface Items {
@@ -18,8 +24,11 @@ interface Items {
 }
 
 const ItemList = () => {
+  //Create state http status error
+  const [statusError, setStatusError] = useState<number | null>(null);
+
   // Fetch items using useGetItems()
-  const { data: items, isLoading, isError, error } = useGetItems();
+  const { data: items, isLoading } = useGetItems(setStatusError);
 
   // Create state for select display
   const [selectDisplay, setSelectDisplay] = useState("all");
@@ -67,36 +76,25 @@ const ItemList = () => {
     return (
       <>
         <NavBar />
-        <div className="container mx-auto py-10 px-10 sm:px-15 lg:px-20">
-          <div className=" mt-10 grid grid-cols-1 lg:grid-cols-2 2xl:grid-cols-3 gap-6">
-            <div className="skeleton h-32 bg-gray-100"></div>
-            <div className="skeleton h-32 bg-gray-100"></div>
-            <div className="skeleton h-32 bg-gray-100"></div>
-            <div className="skeleton h-32 bg-gray-100"></div>
-            <div className="skeleton h-32 bg-gray-100"></div>
-            <div className="skeleton h-32 bg-gray-100"></div>
-          </div>
-        </div>
+        <LoadItemList />
       </>
     );
   }
 
   // Return JSX with error condition
-  if (isError) {
-    const axiosError = error as AxiosError; //Change error to AxiosError Type
-    return (
-      <>
-        <NavBar />
-        <div className="mt-10 flex flex-col items-center gap-5">
-          {axiosError.request ? (
-            <p className="text-5xl text-gray-500">500</p>
-          ) : (
-            <p className="text-5xl text-gray-500">{axiosError.response?.status}</p>
-          )}
-          <p className="text-xl text-gray-400">{axiosError.message}</p>
-        </div>
-      </>
-    );
+  if (statusError !== null) {
+    switch (statusError) {
+      case 0:
+        return <ErrorNetwork />;
+      case 401:
+        return <Error401 />;
+      case 404:
+        return <Error404 />;
+      case 500:
+        return <Error500 />;
+      default:
+        return <ErrorUnexpected />;
+    }
   }
 
   //Return JSX with normal condition
