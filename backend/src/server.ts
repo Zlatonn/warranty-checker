@@ -1,8 +1,11 @@
-import express, { Request, Response } from "express";
+import express, { query, Request, Response } from "express";
 import bodyParser from "body-parser";
 import cors from "cors";
 import bcrypt from "bcrypt";
 import jwt from "jsonwebtoken";
+
+// import create/connect db
+import db from "../src/database/database";
 
 // Create an Express application
 const app = express();
@@ -69,8 +72,7 @@ const validToken = (req: Request): boolean => {
 app.get("/users", (req: Request, res: Response) => {
   try {
     // Check valid token
-    const isValidToken = validToken(req);
-    if (!isValidToken) {
+    if (!validToken(req)) {
       // Return invalid token
       res.status(401).json({ error: "Invalid or expired token" });
       return;
@@ -158,12 +160,6 @@ interface Iitems {
   isWarranty: "warranty" | "nearExpire" | "expired";
 }
 
-// Store item list
-const items: Iitems[] = [];
-
-// Define initial id
-let id: number = 1;
-
 // Function valid form (check blank error input and return them)
 const validForm = (body: Iitems): string[] => {
   // Declare erros
@@ -180,7 +176,7 @@ const validForm = (body: Iitems): string[] => {
 };
 
 // Function check warranty
-const checkWanrranty = (date: string) => {
+const checkWarranty = (date: string) => {
   const timeCurr = new Date();
   const timeEnd = new Date(date);
 
@@ -212,15 +208,29 @@ const checkWanrranty = (date: string) => {
 };
 
 /** ---------- PATH => get all items ---------- */
-app.get("/items", (req: Request, res: Response) => {
+app.get("/items", async (req: Request, res: Response) => {
   try {
     // Check valid token
-    const isValidToken = validToken(req);
-    if (!isValidToken) {
+    if (!validToken(req)) {
       // Return invalid token
       res.status(401).json({ error: "Invalid or expired token" });
       return;
     }
+
+    // Query command for get all items
+    const selectAllQuery = "SELECT * FROM items";
+
+    // Get all items from db
+    const items = await new Promise((resolve, reject) => {
+      db.all(selectAllQuery, (err, rows) => {
+        if (err) {
+          reject(err);
+        } else {
+          resolve(rows);
+        }
+      });
+    });
+
     // Return all items
     res.status(200).json(items);
   } catch (error) {
@@ -230,11 +240,10 @@ app.get("/items", (req: Request, res: Response) => {
 });
 
 /** ---------- PATH => get specific item ---------- */
-app.get("/item/:id", (req: Request, res: Response) => {
+app.get("/item/:id", async (req: Request, res: Response) => {
   try {
     // Check valid token
-    const isValidToken = validToken(req);
-    if (!isValidToken) {
+    if (!validToken(req)) {
       // Return invalid token
       res.status(401).json({ error: "Invalid or expired token" });
       return;
@@ -249,8 +258,20 @@ app.get("/item/:id", (req: Request, res: Response) => {
       return;
     }
 
-    // Find item by id
-    const getItem = items.find((item) => item.id === getId);
+    // Query command for find item
+    const selectQuery = "SELECT * FROM items WHERE id = ?";
+    const selectValue = getId;
+
+    // Find item from db
+    const getItem = await new Promise<Iitems[]>((resolve, reject) => {
+      db.all(selectQuery, selectValue, (err, rows) => {
+        if (err) {
+          reject(err);
+        } else {
+          resolve(rows as Iitems[]);
+        }
+      });
+    });
 
     // Check when item not found
     if (!getItem) {
@@ -258,8 +279,8 @@ app.get("/item/:id", (req: Request, res: Response) => {
       return;
     }
 
-    // Return specfic item
-    res.status(200).json(getItem);
+    // Return specfic items
+    res.status(200).json(getItem[0]);
   } catch (error) {
     console.error("Error fetching item:", error);
     res.status(500).json({ error: "Internal server error" });
@@ -267,11 +288,10 @@ app.get("/item/:id", (req: Request, res: Response) => {
 });
 
 /** ---------- PATH => create item ---------- */
-app.post("/create", (req: Request, res: Response) => {
+app.post("/create", async (req: Request, res: Response) => {
   try {
     // Check valid token
-    const isValidToken = validToken(req);
-    if (!isValidToken) {
+    if (!validToken(req)) {
       // Return invalid token
       res.status(401).json({ error: "Invalid or expired token" });
       return;
@@ -288,29 +308,34 @@ app.post("/create", (req: Request, res: Response) => {
     }
 
     // Check warranty item
-    const { daysLeft, isWarranty } = checkWanrranty(body.endDate);
+    const { daysLeft, isWarranty } = checkWarranty(body.endDate);
 
-    // Manage pattern data
-    const newItem = {
-      id: id,
-      itemName: body.itemName,
-      serialNumber: body.serialNumber,
-      endDate: body.endDate,
-      notes: body.notes,
-      remainDays: daysLeft,
-      isWarranty: isWarranty,
-    };
+    // Query command for create item
+    const createQuery = "INSERT INTO items (itemName,serialNumber,endDate,notes,remainDays,isWarranty) VALUES (?,?,?,?,?,?)";
+    const createValue = [body.itemName, body.serialNumber, body.endDate, body.notes, daysLeft, isWarranty];
 
-    // Add new item
-    items.push(newItem);
-
-    // Increment id
-    id += 1;
+    // Add new item to db
+    await new Promise<void>((resolve, reject) => {
+      db.run(createQuery, createValue, (err) => {
+        if (err) {
+          reject(err);
+        } else {
+          resolve();
+        }
+      });
+    });
 
     // Response create complete
     res.status(201).json({
       message: "create complete",
-      newItem: newItem,
+      newItem: {
+        itemName: body.itemName,
+        serialNumber: body.serialNumber,
+        endDate: body.endDate,
+        notes: body.notes,
+        remainDays: daysLeft,
+        isWarranty: isWarranty,
+      },
     });
   } catch (error) {
     console.error("Error create item:", error);
@@ -319,11 +344,10 @@ app.post("/create", (req: Request, res: Response) => {
 });
 
 /** ---------- PATH => update item ---------- */
-app.put("/item/:id", (req: Request, res: Response) => {
+app.put("/item/:id", async (req: Request, res: Response) => {
   try {
     // Check valid token
-    const isValidToken = validToken(req);
-    if (!isValidToken) {
+    if (!validToken(req)) {
       // Return invalid token
       res.status(401).json({ error: "Invalid or expired token" });
       return;
@@ -348,8 +372,20 @@ app.put("/item/:id", (req: Request, res: Response) => {
       return;
     }
 
-    // Find update item
-    const updateItem = items.find((item) => item.id === getId);
+    // Query command for find update item
+    const selectQuery = "SELECT * FROM items WHERE id = ?";
+    const selectValue = [getId];
+
+    // Find update item from db
+    const updateItem = await new Promise((resolve, reject) => {
+      db.get(selectQuery, selectValue, (err, rows) => {
+        if (err) {
+          reject(err);
+        } else {
+          resolve(rows);
+        }
+      });
+    });
 
     // Check when item not found
     if (!updateItem) {
@@ -358,20 +394,35 @@ app.put("/item/:id", (req: Request, res: Response) => {
     }
 
     // Get update warranty item data
-    const { daysLeft, isWarranty } = checkWanrranty(body.endDate);
+    const { daysLeft, isWarranty } = checkWarranty(body.endDate);
 
-    // Update item
-    updateItem.itemName = body.itemName;
-    updateItem.serialNumber = body.serialNumber;
-    updateItem.endDate = body.endDate;
-    updateItem.notes = body.notes;
-    updateItem.remainDays = daysLeft;
-    updateItem.isWarranty = isWarranty;
+    // Query command for update item
+    const updateQuery =
+      "UPDATE items SET itemName = ?, serialNumber = ?, endDate = ?, notes = ?, remainDays = ?,isWarranty = ? WHERE id = ?";
+    const updateValue = [body.itemName, body.serialNumber, body.endDate, body.notes, daysLeft, isWarranty, getId];
+
+    // Upate item to db
+    await new Promise<void>((resolve, reject) => {
+      db.run(updateQuery, updateValue, (err) => {
+        if (err) {
+          reject(err);
+        } else {
+          resolve();
+        }
+      });
+    });
 
     // Response update complete
     res.status(200).json({
       message: "update complete",
-      data: updateItem,
+      data: {
+        itemName: body.itemName,
+        serialNumber: body.serialNumber,
+        endDate: body.endDate,
+        notes: body.notes,
+        remainDays: daysLeft,
+        isWarranty: isWarranty,
+      },
     });
   } catch (error) {
     console.error("Error updating item:", error);
@@ -380,11 +431,10 @@ app.put("/item/:id", (req: Request, res: Response) => {
 });
 
 /** ---------- PATH => delete item ---------- */
-app.delete("/item/:id", (req: Request, res: Response) => {
+app.delete("/item/:id", async (req: Request, res: Response) => {
   try {
     // Check valid token
-    const isValidToken = validToken(req);
-    if (!isValidToken) {
+    if (!validToken(req)) {
       // Return invalid token
       res.status(401).json({ error: "Invalid or expired token" });
       return;
@@ -399,25 +449,46 @@ app.delete("/item/:id", (req: Request, res: Response) => {
       return;
     }
 
-    // Find delete index
-    const deleteIndex = items.findIndex((item) => item.id === getId);
+    // Query command for find update item
+    const selectQuery = "SELECT * FROM items WHERE id = ?";
+    const selectValue = [getId];
+
+    // Find update item from db
+    const deleteItem = await new Promise((resolve, reject) => {
+      db.get(selectQuery, selectValue, (err, rows) => {
+        if (err) {
+          reject(err);
+        } else {
+          resolve(rows);
+        }
+      });
+    });
 
     // Check when item not found
-    if (deleteIndex === -1) {
+    if (!deleteItem) {
       res.status(404).json({ error: `Item with ID:${getId} not found` });
       return;
     }
 
-    // Buffer delete data
-    const deleteData = items[deleteIndex];
+    // Query command for find update item
+    const deleteQuery = "DELETE FROM items WHERE id = ?";
+    const deleteValue = [getId];
 
-    // Delete item
-    items.splice(deleteIndex, 1);
+    // Delete item from db
+    await new Promise<void>((resolve, reject) => {
+      db.run(deleteQuery, deleteValue, (err) => {
+        if (err) {
+          reject(err);
+        } else {
+          resolve();
+        }
+      });
+    });
 
     // Response delete complete
     res.status(200).json({
       message: "delete complete",
-      data: deleteData,
+      data: deleteItem,
     });
   } catch (error) {
     console.error("Error deleting item:", error);
