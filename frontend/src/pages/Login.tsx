@@ -1,6 +1,7 @@
 import { Link } from "react-router-dom";
 import { useState } from "react";
 import { SubmitHandler, useForm } from "react-hook-form";
+import { useDebouncedCallback } from "use-debounce";
 
 import { useLogin } from "../hooks/useApi";
 
@@ -22,8 +23,27 @@ const Login = () => {
   const {
     register,
     handleSubmit,
+    trigger,
+    setValue,
     formState: { errors },
-  } = useForm<Iform>();
+  } = useForm<Iform>({
+    defaultValues: {
+      email: "",
+      password: "",
+    },
+  });
+
+  // Debounced trigger email valid
+  const debouncedEmail = useDebouncedCallback((value) => {
+    setValue("email", value);
+    trigger("email");
+  }, 500);
+
+  // Debounced trigger password valid
+  const debouncedPassword = useDebouncedCallback((value) => {
+    setValue("password", value);
+    trigger("password");
+  }, 500);
 
   //Create state http status error
   const [statusError, setStatusError] = useState<number | null>(null);
@@ -81,6 +101,7 @@ const Login = () => {
                     message: "*** Invalid email format ***",
                   },
                 })}
+                onChange={(e) => debouncedEmail(e.target.value)}
               />
               {errors.email && <p className="w-fit mt-1 text-red-500 text-xs">{errors.email.message}</p>}
             </div>
@@ -93,6 +114,7 @@ const Login = () => {
                 {...register("password", {
                   required: "*** Password is required ***",
                 })}
+                onChange={(e) => debouncedPassword(e.target.value)}
               />
               {errors.password && <p className="w-fit mt-1 text-red-500 text-xs">{errors.password.message}</p>}
             </div>

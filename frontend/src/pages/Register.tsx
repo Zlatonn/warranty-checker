@@ -1,6 +1,7 @@
 import { Link } from "react-router-dom";
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { useForm, SubmitHandler } from "react-hook-form";
+import { useDebouncedCallback } from "use-debounce";
 
 import { useRegister } from "../hooks/useApi";
 
@@ -23,9 +24,42 @@ const Register = () => {
   const {
     register,
     handleSubmit,
-    watch,
+    trigger,
+    setValue,
     formState: { errors },
-  } = useForm<Iform>();
+  } = useForm<Iform>({
+    defaultValues: {
+      email: "",
+      username: "",
+      password: "",
+    },
+  });
+
+  // Create state for track valid status
+  const [isEmailValid, setIsEmailValid] = useState(false);
+  const [isUsernameValid, setIsUsernameValid] = useState(false);
+  const [isPasswordValid, setIsPasswordValid] = useState(false);
+
+  // Debounced trigger email valid
+  const debouncedEmail = useDebouncedCallback(async (value) => {
+    setValue("email", value);
+    const validStatus = await trigger("email");
+    setIsEmailValid(validStatus);
+  }, 500);
+
+  // Debounced trigger username valid
+  const debouncedUsername = useDebouncedCallback(async (value) => {
+    setValue("username", value);
+    const validStatus = await trigger("username");
+    setIsUsernameValid(validStatus);
+  }, 500);
+
+  // Debounced trigger password valid
+  const debouncedPassword = useDebouncedCallback(async (value) => {
+    setValue("password", value);
+    const validStatus = await trigger("password");
+    setIsPasswordValid(validStatus);
+  }, 500);
 
   //Create state http status error
   const [statusError, setStatusError] = useState<number | null>(null);
@@ -37,32 +71,6 @@ const Register = () => {
   const onSubmit: SubmitHandler<Iform> = (data) => {
     registerUser(data);
   };
-
-  // Watch form values
-  const email = watch("email");
-  const username = watch("username");
-  const password = watch("password");
-
-  // Create state for track valid status
-  const [isEmailValid, setIsEmailValid] = useState(false);
-  const [isUsernameValid, setIsUsernameValid] = useState(false);
-  const [isPasswordValid, setIsPasswordValid] = useState(false);
-
-  // Check isValid pattern
-  useEffect(() => {
-    const emailPattern = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
-    setIsEmailValid(emailPattern.test(email));
-  }, [email]);
-
-  useEffect(() => {
-    const usernamePattern = /^[a-zA-Z0-9]{3,20}$/;
-    setIsUsernameValid(usernamePattern.test(username));
-  }, [username]);
-
-  useEffect(() => {
-    const passwordPattern = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)[A-Za-z\d]{8,20}$/;
-    setIsPasswordValid(passwordPattern.test(password));
-  }, [password]);
 
   // Return JSX with error condition
   if (statusError !== null) {
@@ -121,7 +129,9 @@ const Register = () => {
                       message: "Invalid email format.",
                     },
                   })}
+                  onChange={(e) => debouncedEmail(e.target.value)}
                 />
+
                 <p className="text-xs text-gray-500">Please enter your email.</p>
                 {isEmailValid && <span className="absolute right-3 top-9">✅</span>}
                 {errors.email && <p className="w-fit mt-1 text-red-500 text-xs py-1 px-2 bg-red-100 rounded-md">{errors.email.message}</p>}
@@ -141,6 +151,7 @@ const Register = () => {
                       message: "Invalid username format.",
                     },
                   })}
+                  onChange={(e) => debouncedUsername(e.target.value)}
                 />
                 <p className="text-xs text-gray-500">Choose a unique username.</p>
                 {isUsernameValid && <span className="absolute right-3 top-9">✅</span>}
@@ -163,6 +174,7 @@ const Register = () => {
                       message: "Password must contain at least one uppercase, one lowercase and one number.",
                     },
                   })}
+                  onChange={(e) => debouncedPassword(e.target.value)}
                 />
                 <p className="text-xs text-gray-500">Create a strong password at least 8 characters.</p>
                 {isPasswordValid && <span className="absolute right-3 top-9">✅</span>}
