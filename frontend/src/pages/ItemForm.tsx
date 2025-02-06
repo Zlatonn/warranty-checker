@@ -1,5 +1,6 @@
-import { useState, ChangeEvent, useEffect } from "react";
+import { useState, useEffect } from "react";
 import { Link, useParams } from "react-router-dom";
+import { SubmitHandler, useForm } from "react-hook-form";
 
 import { useGetItem, useCreateItem, useUpdateItem, useDeleteItem } from "../hooks/useApi";
 
@@ -19,29 +20,23 @@ interface Iform {
   serialNumber: string;
   endDate: string;
   notes: string;
-  remainDays?: number;
-  isWarranty?: "warranty" | "nearExpire" | "expired";
-}
-
-// Define type form errors
-interface IformErrors {
-  itemName?: string;
-  serialNumber?: string;
-  endDate?: string;
-  notes?: string;
 }
 
 const ItemForm = () => {
-  // Create state formData
-  const [formData, setFormData] = useState<Iform>({
-    itemName: "",
-    serialNumber: "",
-    endDate: "",
-    notes: "",
+  // Register form to validation and submission
+  const {
+    register,
+    handleSubmit,
+    formState: { errors },
+    setValue,
+  } = useForm<Iform>({
+    defaultValues: {
+      itemName: "",
+      serialNumber: "",
+      endDate: "",
+      notes: "",
+    },
   });
-
-  // Create state errors
-  const [formErrors, setFormErrors] = useState<IformErrors>({});
 
   //Create state http status error
   const [statusError, setStatusError] = useState<number | null>(null);
@@ -49,69 +44,34 @@ const ItemForm = () => {
   // Fetch create item useing useCreateItem
   const { mutate: createItem } = useCreateItem(setStatusError);
 
-  // Create state id
-  const [itemId, setItemId] = useState("");
-
   // Get id for edit mode
   const { id } = useParams<{ id: string }>();
 
   // Fetch item ,update, delete item using useCreateItem, useUpdateItem, useDeleteItem
-  const { data: item, isLoading } = useGetItem(itemId, setStatusError);
-  const { mutate: updateItem } = useUpdateItem(itemId, setStatusError);
-  const { mutate: deleteItem } = useDeleteItem(itemId, setStatusError);
+  const { data: item, isLoading } = useGetItem(id || "", setStatusError);
+  const { mutate: updateItem } = useUpdateItem(id || "", setStatusError);
+  const { mutate: deleteItem } = useDeleteItem(id || "", setStatusError);
 
-  // Update form itemId & formData
+  // Update form id & formData
   useEffect(() => {
     if (id) {
-      setItemId(id);
       if (item) {
-        setFormData({
-          itemName: item.itemName || "",
-          serialNumber: item.serialNumber || "",
-          endDate: item.endDate || "",
-          notes: item.notes || "",
-        });
+        setValue("itemName", item.itemName || "");
+        setValue("serialNumber", item.serialNumber || "");
+        setValue("endDate", item.endDate || "");
+        setValue("notes", item.notes || "");
       }
     }
-  }, [id, item]);
+  }, [id, item, setValue]);
 
-  // Function handle input change
-  const handleInputChange = (e: ChangeEvent<HTMLInputElement> | ChangeEvent<HTMLTextAreaElement>) => {
-    const { name, value } = e.target;
-    {
-      setFormData((prev) => ({
-        ...prev,
-        [name]: value,
-      }));
+  // // Function on submit form
+  const onSubmit: SubmitHandler<Iform> = (data) => {
+    if (!id) {
+      // Create mode
+      createItem(data);
+      return;
     }
-  };
-
-  // Function valid form
-  const validForm = (body: Iform) => {
-    const validErrors: IformErrors = {};
-    if (!body.itemName) validErrors.itemName = "*** Item name is required ***";
-    if (!body.serialNumber) validErrors.serialNumber = "*** Serial number is required ***";
-    if (!body.endDate) validErrors.endDate = "*** Warranty end date is required ***";
-    if (!body.notes) validErrors.notes = "*** Notes is required ***";
-    return validErrors;
-  };
-
-  // Function handle form submit
-  const handleSubmit = () => {
-    const invalid: IformErrors = validForm(formData);
-    setFormErrors(invalid);
-
-    // Check erros object is empty
-    if (Object.keys(invalid).length === 0) {
-      // Check mode
-      if (!itemId) {
-        // Create mode
-        createItem(formData);
-        return;
-      }
-      // Edit mode
-      updateItem(formData);
-    }
+    updateItem(data);
   };
 
   // Function handle form delete
@@ -158,72 +118,77 @@ const ItemForm = () => {
     <>
       <NavBar />
       <div className="container mx-auto py-10 px-10 sm:px-15 lg:px-20">
-        <div className="py-5 flex flex-col gap-5 lg:px-40">
+        <form className="py-5 flex flex-col gap-5 lg:px-40" onSubmit={handleSubmit(onSubmit)}>
           <div className="flex flex-col gap-5">
-            <h1 className="text-2xl font-bold text-gray-800">{!itemId ? "Create new item" : "Edit item"}</h1>
+            <h1 className="text-2xl font-bold text-gray-800">{!id ? "Create new item" : "Edit item"}</h1>
             <p className="text-gray-500 text-sm lg:text-md">
-              {!itemId
+              {!id
                 ? "This feature allows users to add a new item to the system. You can input the item's details such as name, serial number, warranty end date, and any additional notes. Once submitted, the item will be saved and displayed in the item list for tracking."
                 : "This feature enables users to update the details of an existing item. You can modify the item's name, serial number, warranty information, or notes. This ensures that item details remain accurate and up to date in the system."}
             </p>
 
             <hr />
           </div>
+
           <div className="flex flex-col gap-8 text-gray-500">
+            {/* itemName field */}
             <div className="flex flex-col gap-1">
               <p className="font-semibold text-gray-800">Item name</p>
               <input
                 type="text"
                 placeholder="type item name..."
-                name="itemName"
-                value={formData?.itemName}
-                onChange={handleInputChange}
                 className="input input-bordered w-full max-w-xs h-10"
+                {...register("itemName", {
+                  required: "*** Item name is required ***",
+                })}
               />
-              {formErrors.itemName && <p className="w-fit mt-1 text-red-500 text-sm">{formErrors.itemName}</p>}
+              {errors.itemName && <p className="w-fit mt-1 text-red-500 text-sm">{errors.itemName.message}</p>}
             </div>
+            {/* Serial number field */}
             <div className="flex flex-col gap-1">
               <p className="font-semibold text-gray-800">Serial number</p>
               <input
                 type="text"
                 placeholder="type serial number..."
-                name="serialNumber"
-                value={formData?.serialNumber}
-                onChange={handleInputChange}
                 className="input input-bordered w-full max-w-xs h-10"
+                {...register("serialNumber", {
+                  required: "*** Serial number is required ***",
+                })}
               />
-              {formErrors.serialNumber && <p className="w-fit mt-1 text-red-500 text-sm">{formErrors.serialNumber}</p>}
+              {errors.serialNumber && <p className="w-fit mt-1 text-red-500 text-sm">{errors.serialNumber.message}</p>}
             </div>
+            {/* Warranty end date field */}
             <div className="flex flex-col gap-1">
               <p className="font-semibold text-gray-800">Warranty end date</p>
               <input
                 type="date"
-                name="endDate"
-                value={formData?.endDate}
-                onChange={handleInputChange}
                 className="input input-bordered w-full max-w-xs h-10"
+                {...register("endDate", {
+                  required: "*** Warranty end date is required ***",
+                })}
               />
-              {formErrors.endDate && <p className="w-fit mt-1 text-red-500 text-sm">{formErrors.endDate}</p>}
+              {errors.endDate && <p className="w-fit mt-1 text-red-500 text-sm">{errors.endDate.message}</p>}
             </div>
+            {/* Notes field */}
             <div className="flex flex-col gap-1">
               <p className="font-semibold text-gray-800">notes</p>
               <textarea
                 placeholder="type notes..."
-                name="notes"
-                value={formData?.notes}
-                onChange={handleInputChange}
                 className="textarea textarea-bordered"
+                {...register("notes", {
+                  required: "*** Notes is required ***",
+                })}
               />
-              {formErrors.notes && <p className="w-fit mt-1 text-red-500 text-sm">{formErrors.notes}</p>}
+              {errors.notes && <p className="w-fit mt-1 text-red-500 text-sm">{errors.notes.message}</p>}
             </div>
           </div>
           <div className="mt-10 flex justify-end gap-3">
             <Link to="/items">
               <button className="btn p-2 w-24 bg-[#d9d9d9] rounded-lg">Back</button>
             </Link>
-            {!itemId ? (
+            {!id ? (
               <>
-                <button onClick={handleSubmit} className="btn p-2 w-24 bg-green-500 rounded-lg text-white">
+                <button type="submit" className="btn p-2 w-24 bg-green-500 rounded-lg text-white">
                   Create
                 </button>
               </>
@@ -232,13 +197,13 @@ const ItemForm = () => {
                 <button onClick={handleDelete} className="btn p-2 w-24 bg-red-500 rounded-lg  text-white">
                   Delete
                 </button>
-                <button onClick={handleSubmit} className="btn p-2 w-24 bg-blue-500 rounded-lg text-white">
+                <button type="submit" className="btn p-2 w-24 bg-blue-500 rounded-lg text-white">
                   Edit
                 </button>
               </>
             )}
           </div>
-        </div>
+        </form>
       </div>
     </>
   );
