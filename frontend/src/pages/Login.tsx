@@ -1,5 +1,6 @@
 import { Link } from "react-router-dom";
-import { ChangeEvent, useState } from "react";
+import { useState } from "react";
+import { SubmitHandler, useForm } from "react-hook-form";
 
 import { useLogin } from "../hooks/useApi";
 
@@ -16,21 +17,13 @@ interface Iform {
   password: string;
 }
 
-//Define type of form error
-interface IformErrors {
-  email?: string;
-  password?: string;
-}
-
 const Login = () => {
-  // Create form login
-  const [formData, setFormData] = useState<Iform>({
-    email: "",
-    password: "",
-  });
-
-  // Create state errors
-  const [formErrors, setFormErrors] = useState<IformErrors>({});
+  // Register form to validation and submission
+  const {
+    register,
+    handleSubmit,
+    formState: { errors },
+  } = useForm<Iform>();
 
   //Create state http status error
   const [statusError, setStatusError] = useState<number | null>(null);
@@ -38,31 +31,9 @@ const Login = () => {
   // Fetch register user using userRegister
   const { mutate: loingUser } = useLogin(setStatusError);
 
-  // Function handle input change
-  const handleInputChange = (e: ChangeEvent<HTMLInputElement>) => {
-    const { name, value } = e.target;
-    setFormData((prev) => ({
-      ...prev,
-      [name]: value,
-    }));
-  };
-
-  // Function valid form
-  const validForm = (body: Iform) => {
-    const validErrors: IformErrors = {};
-    if (!body.email) validErrors.email = "*** Username is required ***";
-    if (!body.password) validErrors.password = "*** Password end date is required ***";
-
-    return validErrors;
-  };
-
   // Function handle submit
-  const handleSubmit = () => {
-    const invalid: IformErrors = validForm(formData);
-    setFormErrors(invalid);
-    if (Object.keys(invalid).length === 0) {
-      loingUser(formData);
-    }
+  const onSubmit: SubmitHandler<Iform> = (data) => {
+    loingUser(data);
   };
 
   // Return JSX with error condition
@@ -92,7 +63,7 @@ const Login = () => {
 
       {/* content */}
       <div className="hero-content text-neutral-content text-center">
-        <div className="max-w-md bg-white text-gray-800 p-8 sm:p-10 rounded-xl">
+        <form className="max-w-md bg-white text-gray-800 p-8 sm:p-10 rounded-xl" onSubmit={handleSubmit(onSubmit)}>
           <h1 className="text-xl sm:text-2xl font-bold mb-7 sm:mb-10">
             <span className="text-blue-500">Sign in</span> to Warranty Checker
           </h1>
@@ -101,27 +72,31 @@ const Login = () => {
               <p className="text-gray-800">Email</p>
               <input
                 type="text"
-                name="email"
-                value={formData.email}
-                onChange={handleInputChange}
                 placeholder="Email"
                 className="input input-bordered w-full h-10"
+                {...register("email", {
+                  required: "*** Email is required ***",
+                  pattern: {
+                    value: /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/,
+                    message: "*** Invalid email format ***",
+                  },
+                })}
               />
-              {formErrors.email && <p className="w-fit mt-1 text-red-500 text-xs">{formErrors.email}</p>}
+              {errors.email && <p className="w-fit mt-1 text-red-500 text-xs">{errors.email.message}</p>}
             </div>
             <div className="flex flex-col gap-1 text-left">
               <p className="text-gray-800">Password</p>
               <input
                 type="password"
-                name="password"
-                value={formData.password}
-                onChange={handleInputChange}
                 placeholder="Password"
                 className="input input-bordered w-full h-10"
+                {...register("password", {
+                  required: "*** Password is required ***",
+                })}
               />
-              {formErrors.password && <p className="w-fit mt-1 text-red-500 text-xs">{formErrors.password}</p>}
+              {errors.password && <p className="w-fit mt-1 text-red-500 text-xs">{errors.password.message}</p>}
             </div>
-            <button onClick={handleSubmit} className="w-full my-3 bg-green-600 text-white py-3 rounded-lg hover:opacity-80">
+            <button type="submit" className="w-full my-3 bg-green-600 text-white py-3 rounded-lg hover:opacity-80">
               Sign in
             </button>
             <p className="text-xs sm:text-sm text-gray-500">
@@ -131,7 +106,7 @@ const Login = () => {
               </Link>
             </p>
           </div>
-        </div>
+        </form>
       </div>
     </div>
   );
