@@ -65,50 +65,13 @@ const getAuthorHeader = () => {
  * User api
  */
 
-// Define type register form
-interface Iregister {
-  email: string;
-  username: string;
-  password: string;
-}
-
 // Define type log in form
 interface Ilogin {
   email: string;
   password: string;
 }
 
-// Fetch register user
-export const useRegister = (setStatusError: (status: number | null) => void) => {
-  const navigate = useNavigate();
-  return useMutation({
-    mutationKey: ["register"],
-    mutationFn: async (userInfo: Iregister) => {
-      const response = await axiosClient.post(`/register`, userInfo);
-      return response.data;
-    },
-    // When success => alert and navigate to path "/login"
-    onSuccess: () => {
-      toast.success("Registered successfully! 👍🏻");
-      navigate("/login");
-    },
-    onError: (error: AxiosError) => {
-      // When error => setSttusError using callback for navigate to error pages component
-      if (!error.response) {
-        setStatusError(0);
-      } else {
-        const status = error.response.status;
-        if (status === 400) {
-          toast.error("Email or Username exists. 👎🏻");
-        } else {
-          setStatusError(status);
-        }
-      }
-    },
-  });
-};
-
-// Fetch register user
+// Fetch login user
 export const useLogin = (setStatusError: (status: number | null) => void) => {
   const navigate = useNavigate();
   return useMutation({

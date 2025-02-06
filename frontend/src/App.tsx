@@ -3,7 +3,6 @@ import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { ToastContainer, Bounce } from "react-toastify";
 
 import Home from "./pages/Home";
-import Register from "./pages/Register";
 import Login from "./pages/Login";
 import ItemList from "./pages/ItemList";
 import ItemForm from "./pages/ItemForm";
@@ -23,7 +22,6 @@ const App = () => {
           <Routes>
             <Route element={<PublicRoutes />}>
               <Route path="/" element={<Home />} />
-              <Route path="/register" element={<Register />} />
               <Route path="/login" element={<Login />} />
             </Route>
             {/* Private routes when have token*/}

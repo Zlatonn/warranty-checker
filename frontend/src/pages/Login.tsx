@@ -1,4 +1,3 @@
-import { Link } from "react-router-dom";
 import { useState } from "react";
 import { SubmitHandler, useForm } from "react-hook-form";
 import { useDebouncedCallback } from "use-debounce";
@@ -129,12 +128,6 @@ const Login = () => {
             <button type="submit" className="w-full my-3 bg-green-600 text-white py-3 rounded-lg hover:opacity-80">
               Sign in
             </button>
-            <p className="text-xs sm:text-sm text-gray-500">
-              New to Warranty Checker?
-              <Link to="/register">
-                <span className="text-blue-500 cursor-pointer hover:underline"> Create an account</span>
-              </Link>
-            </p>
           </div>
         </form>
       </div>

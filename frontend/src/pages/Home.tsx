@@ -26,10 +26,7 @@ const Home = () => {
             </p>
             <div className="flex gap-3 justify-center">
               <Link to="/login">
-                <button className="btn hover:underline">Sign In</button>
-              </Link>
-              <Link to="/register">
-                <button className="btn btn-primary hover:underline">Sign Up</button>
+                <button className="btn btn-primary hover:underline">Sign In</button>
               </Link>
             </div>
           </div>
