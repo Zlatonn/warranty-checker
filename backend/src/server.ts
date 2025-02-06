@@ -36,7 +36,13 @@ interface Iuser {
 const secret = "mysecret";
 
 // Store users
-const users: Iuser[] = [];
+const users: Iuser[] = [
+  {
+    email: "warranty@mail.com",
+    username: "warranty001",
+    password: "$2b$10$XUp3ghr7nNqb./YbLjM9i.4ksxAu0ZhfU39WDVaQ4L8yfth1inmSa",
+  },
+];
 
 // Check validToken function (if have token => true / haven't token => false)
 const validToken = (req: Request): boolean => {
@@ -67,58 +73,6 @@ const validToken = (req: Request): boolean => {
   // If have token is valid
   return true;
 };
-
-/** ---------- PATH => get users ---------- */
-app.get("/users", (req: Request, res: Response) => {
-  try {
-    // Check valid token
-    if (!validToken(req)) {
-      // Return invalid token
-      res.status(401).json({ error: "Invalid or expired token" });
-      return;
-    }
-    // Reuturn all users
-    res.status(200).json(users);
-  } catch (error) {
-    console.error("Error get users:", error);
-    res.status(500).json({ error: "Internal server error" });
-  }
-});
-
-/** ---------- PATH => register user ---------- */
-app.post("/register", async (req: Request, res: Response) => {
-  try {
-    // Get data from body
-    const { email, username, password } = req.body;
-
-    // Password hash function before push to data base
-    const passwordHash = await bcrypt.hash(password, 10);
-
-    // Declear userData
-    const userData = {
-      email,
-      username,
-      password: passwordHash,
-    };
-
-    // Check already exists user
-    const existingUser = users.find((user) => user.email === userData.email || user.username === userData.username);
-    if (existingUser) {
-      // Return user already exists
-      res.status(400).json({ message: "User already exists" });
-      return;
-    }
-
-    // Add userData to users
-    users.push(userData);
-
-    // Return registerd complete
-    res.status(201).json({ message: "User registered complete" });
-  } catch (error) {
-    console.error("Error register user:", error);
-    res.status(500).json({ error: "Internal server error" });
-  }
-});
 
 /** ---------- PATH => login user ---------- */
 app.post("/login", async (req: Request, res: Response) => {
@@ -169,7 +123,6 @@ const validForm = (body: Iitems): string[] => {
   if (!body.itemName) errors.push("itemName is required");
   if (!body.serialNumber) errors.push("serialNumber is required");
   if (!body.endDate) errors.push("endDate is required");
-  if (!body.notes) errors.push("notes is required");
 
   // Return errors
   return errors;

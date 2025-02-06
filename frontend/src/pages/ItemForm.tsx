@@ -172,13 +172,7 @@ const ItemForm = () => {
             {/* Notes field */}
             <div className="flex flex-col gap-1">
               <p className="font-semibold text-gray-800">notes</p>
-              <textarea
-                placeholder="type notes..."
-                className="textarea textarea-bordered"
-                {...register("notes", {
-                  required: "*** Notes is required ***",
-                })}
-              />
+              <textarea placeholder="type notes..." className="textarea textarea-bordered" {...register("notes")} />
               {errors.notes && <p className="w-fit mt-1 text-red-500 text-sm">{errors.notes.message}</p>}
             </div>
           </div>
