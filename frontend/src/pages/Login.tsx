@@ -11,6 +11,8 @@ import ErrorNetwork from "../components/error/ErrorNetwork";
 import ErrorUnexpected from "../components/error/ErrorUnexpected";
 
 import bgLogin from "../assets/bg_login.jpg";
+import eyeIcon from "../assets/eye-solid.svg";
+import eyeSlashIcon from "../assets/eye-slash-solid.svg";
 
 //Define type of form
 interface Iform {
@@ -45,7 +47,10 @@ const Login = () => {
     trigger("password");
   }, 500);
 
-  //Create state http status error
+  // Create state isDisplayPassword
+  const [isDisplayPassword, setIsDisplaypassword] = useState(false);
+
+  // Create state http status error
   const [statusError, setStatusError] = useState<number | null>(null);
 
   // Fetch register user using userRegister
@@ -105,10 +110,10 @@ const Login = () => {
               />
               {errors.email && <p className="w-fit mt-1 text-red-500 text-xs">{errors.email.message}</p>}
             </div>
-            <div className="flex flex-col gap-1 text-left">
+            <div className="relative flex flex-col gap-1 text-left">
               <p className="text-gray-800">Password</p>
               <input
-                type="password"
+                type={isDisplayPassword ? "text" : "password"}
                 placeholder="Password"
                 className="input input-bordered w-full h-10"
                 {...register("password", {
@@ -116,6 +121,9 @@ const Login = () => {
                 })}
                 onChange={(e) => debouncedPassword(e.target.value)}
               />
+              <span className="absolute top-10 right-3 w-5 cursor-pointer" onClick={() => setIsDisplaypassword(!isDisplayPassword)}>
+                <img src={isDisplayPassword ? eyeIcon : eyeSlashIcon} alt={isDisplayPassword ? "eyeIcon" : "eyeSlashIcon"} />
+              </span>
               {errors.password && <p className="w-fit mt-1 text-red-500 text-xs">{errors.password.message}</p>}
             </div>
             <button type="submit" className="w-full my-3 bg-green-600 text-white py-3 rounded-lg hover:opacity-80">
