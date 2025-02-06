@@ -171,7 +171,7 @@ const Register = () => {
                     required: "Password is required.",
                     pattern: {
                       value: /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)[A-Za-z\d]{8,20}$/,
-                      message: "Password must contain at least one uppercase, one lowercase and one number.",
+                      message: "Password must have A-Z, a-z & 0-9.",
                     },
                   })}
                   onChange={(e) => debouncedPassword(e.target.value)}
