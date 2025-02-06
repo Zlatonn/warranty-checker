@@ -169,7 +169,6 @@ const validForm = (body: Iitems): string[] => {
   if (!body.itemName) errors.push("itemName is required");
   if (!body.serialNumber) errors.push("serialNumber is required");
   if (!body.endDate) errors.push("endDate is required");
-  if (!body.notes) errors.push("notes is required");
 
   // Return errors
   return errors;
