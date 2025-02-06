@@ -1,6 +1,6 @@
 import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
-import { ReactQueryDevtools } from "@tanstack/react-query-devtools";
+import { ToastContainer, Bounce } from "react-toastify";
 
 import Home from "./pages/Home";
 import Register from "./pages/Register";
@@ -37,7 +37,21 @@ const App = () => {
           </Routes>
         </div>
       </Router>
-      <ReactQueryDevtools initialIsOpen={true} buttonPosition="bottom-right" />
+
+      {/* Toast notification container */}
+      <ToastContainer
+        position="bottom-right"
+        autoClose={3000}
+        hideProgressBar
+        newestOnTop={false}
+        closeOnClick={false}
+        rtl={false}
+        pauseOnFocusLoss
+        draggable
+        pauseOnHover
+        theme="colored"
+        transition={Bounce}
+      />
     </QueryClientProvider>
   );
 };

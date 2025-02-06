@@ -1,6 +1,7 @@
 import { useMutation, useQuery } from "@tanstack/react-query";
 import axios, { AxiosError } from "axios";
 import { useNavigate } from "react-router-dom";
+import { toast } from "react-toastify";
 
 // Create axios instance for set default config
 const axiosClient = axios.create({
@@ -88,7 +89,7 @@ export const useRegister = (setStatusError: (status: number | null) => void) => 
     },
     // When success => alert and navigate to path "/login"
     onSuccess: () => {
-      alert("You have been successfully registered. ✅");
+      toast.success("Registered successfully! 👍🏻");
       navigate("/login");
     },
     onError: (error: AxiosError) => {
@@ -98,7 +99,7 @@ export const useRegister = (setStatusError: (status: number | null) => void) => 
       } else {
         const status = error.response.status;
         if (status === 400) {
-          alert("Email or Username already exists. ❌");
+          toast.error("Email or Username exists. 👎🏻");
         } else {
           setStatusError(status);
         }
@@ -122,7 +123,7 @@ export const useLogin = (setStatusError: (status: number | null) => void) => {
         // save token to local storage
         localStorage.setItem("token", res.token);
       }
-      alert("You has been successfully loged in. ✅");
+      toast.success("Logged in successfully! 👍🏻");
       navigate("/items");
     },
     onError: (error: AxiosError) => {
@@ -132,7 +133,7 @@ export const useLogin = (setStatusError: (status: number | null) => void) => {
       } else {
         const status = error.response.status;
         if (status === 400) {
-          alert("Invalid Email or Password. ❌");
+          toast.error("Invalid Email or Password. 👎🏻");
         } else {
           setStatusError(status);
         }
@@ -215,7 +216,7 @@ export const useCreateItem = (setStatusError: (status: number | null) => void) =
     },
     // When success => alert and navigate to path "/items"
     onSuccess: () => {
-      alert("The item has been successfully created. ✅");
+      toast.success("Item created! 👍🏻");
       navigate("/items");
     },
     // When error => setSttusError using callback for navigate to error pages component
@@ -241,7 +242,7 @@ export const useUpdateItem = (id: string, setStatusError: (status: number | null
     },
     // When success => alert and navigate to path "/items"
     onSuccess: () => {
-      alert("The item has been successfully updated. ✅");
+      toast.success("Item updated! 👍🏻");
       navigate("/items");
     },
     // When error => setSttusError using callback for navigate to error pages component
@@ -268,7 +269,7 @@ export const useDeleteItem = (id: string, setStatusError: (status: number | null
     },
     // When success => alert and navigate to path "/items"
     onSuccess: () => {
-      alert("The item has been successfully deleted. ✅");
+      toast.success("Item deleted! 👍🏻");
       navigate("/items");
     },
     // When error => setSttusError using callback for navigate to error pages component
