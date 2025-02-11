@@ -1,7 +1,7 @@
 import sqlite3 from "sqlite3";
 
 // Create / Connect DB
-const db = new sqlite3.Database("./database/database.db", (err) => {
+const db = new sqlite3.Database("/data/database.db", (err) => {
   if (err) {
     return console.log("Error opening database:", err.message);
   }

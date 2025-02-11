@@ -5,7 +5,7 @@ import bcrypt from "bcrypt";
 import jwt from "jsonwebtoken";
 
 // import create/connect db
-import db from "../src/database/database";
+import db from "./database";
 
 // Create an Express application
 const app = express();
