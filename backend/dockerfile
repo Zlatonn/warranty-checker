@@ -1,0 +1,26 @@
+# Base image
+FROM node:18
+
+# Define work directory
+WORKDIR /usr/src/app
+
+# Copy package .json and tsconfig.json to container
+COPY package.json package-lock.json tsconfig.json ./
+
+# Install dependency node
+RUN npm install
+
+# Copy file in src to container
+COPY ./src/ ./src/
+
+# Complie typeScript to javaScript
+RUN npm run build
+
+# Create directory for SQLite data
+RUN mkdir -p /data && chmod 777 /data
+
+# Open port
+EXPOSE 8000
+
+# Command for run application
+CMD ["npm","run","start"]
