@@ -5,7 +5,7 @@ import { toast } from "react-toastify";
 
 // Create axios instance for set default config
 const axiosClient = axios.create({
-  baseURL: "http://localhost:8000",
+  baseURL: "https://warranty-expiry-checker-production-7634.up.railway.app/",
   timeout: 5000,
   headers: {
     "Content-Type": "application/json",
