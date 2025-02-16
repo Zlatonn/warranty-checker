@@ -1,7 +1,11 @@
 import sqlite3 from "sqlite3";
+import dotenv from "dotenv";
+
+// Using dotenv
+dotenv.config();
 
 // Create / Connect DB
-const db = new sqlite3.Database("/data/database.db", (err) => {
+const db = new sqlite3.Database(process.env.DB_PATH || "./src/config/database.db", (err) => {
   if (err) {
     return console.log("Error opening database:", err.message);
   }
