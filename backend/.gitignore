@@ -1,0 +1,8 @@
+# depDependencies
+node_modules/
+
+# Database files
+database.db
+
+# Environment Variables
+.env
