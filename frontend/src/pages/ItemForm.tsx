@@ -42,15 +42,15 @@ const ItemForm = () => {
   const [statusError, setStatusError] = useState<number | null>(null);
 
   // Fetch create item useing useCreateItem
-  const { mutate: createItem } = useCreateItem(setStatusError);
+  const { mutate: createItem, isPending: creatingItem } = useCreateItem(setStatusError);
 
   // Get id for edit mode
   const { id } = useParams<{ id: string }>();
 
   // Fetch item ,update, delete item using useCreateItem, useUpdateItem, useDeleteItem
   const { data: item, isLoading } = useGetItem(id || "", setStatusError);
-  const { mutate: updateItem } = useUpdateItem(id || "", setStatusError);
-  const { mutate: deleteItem } = useDeleteItem(id || "", setStatusError);
+  const { mutate: updateItem, isPending: updatingItem } = useUpdateItem(id || "", setStatusError);
+  const { mutate: deleteItem, isPending: deletingItem } = useDeleteItem(id || "", setStatusError);
 
   // Update form id & formData
   useEffect(() => {
@@ -182,16 +182,21 @@ const ItemForm = () => {
             </Link>
             {!id ? (
               <>
-                <button type="submit" className="btn p-2 w-24 bg-green-500 rounded-lg text-white">
+                <button type="submit" disabled={creatingItem} className="btn p-2 w-24 bg-green-500 rounded-lg text-white">
                   Create
                 </button>
               </>
             ) : (
               <>
-                <button onClick={handleDelete} className="btn p-2 w-24 bg-red-500 rounded-lg  text-white">
+                <button
+                  type="button"
+                  onClick={handleDelete}
+                  disabled={deletingItem}
+                  className="btn p-2 w-24 bg-red-500 rounded-lg  text-white"
+                >
                   Delete
                 </button>
-                <button type="submit" className="btn p-2 w-24 bg-blue-500 rounded-lg text-white">
+                <button type="submit" disabled={updatingItem} className="btn p-2 w-24 bg-blue-500 rounded-lg text-white">
                   Edit
                 </button>
               </>
