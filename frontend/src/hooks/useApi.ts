@@ -3,9 +3,12 @@ import axios, { AxiosError } from "axios";
 import { useNavigate } from "react-router-dom";
 import { toast } from "react-toastify";
 
+// Define base url
+const BASE_URL = import.meta.env.VITE_API_URL || "http://localhost:8000";
+
 // Create axios instance for set default config
 const axiosClient = axios.create({
-  baseURL: "https://warranty-expiry-checker-production-7634.up.railway.app/",
+  baseURL: BASE_URL,
   timeout: 5000,
   headers: {
     "Content-Type": "application/json",
@@ -77,7 +80,7 @@ export const useLogin = (setStatusError: (status: number | null) => void) => {
   return useMutation({
     mutationKey: ["login"],
     mutationFn: async (user: Ilogin) => {
-      const response = await axiosClient.post(`/login`, user);
+      const response = await axiosClient.post(`/auth/login`, user);
       return response.data;
     },
     // When success => get token, alert and navigate to path "/items"
@@ -149,7 +152,7 @@ export const useGetItem = (id: string, setStatusError: (status: number | null) =
     queryKey: ["item", id],
     queryFn: async () => {
       try {
-        const response = await axiosClient.get(`/item/${id}`, getAuthorHeader());
+        const response = await axiosClient.get(`/items/${id}`, getAuthorHeader());
         // When success => return item data
         return response.data;
       } catch (error) {
@@ -174,7 +177,7 @@ export const useCreateItem = (setStatusError: (status: number | null) => void) =
   return useMutation({
     mutationKey: ["createItem"],
     mutationFn: async (newItem: Iitem) => {
-      const response = await axiosClient.post(`/create`, newItem, getAuthorHeader());
+      const response = await axiosClient.post(`/items/create`, newItem, getAuthorHeader());
       return response.data;
     },
     // When success => alert and navigate to path "/items"
@@ -200,7 +203,7 @@ export const useUpdateItem = (id: string, setStatusError: (status: number | null
   return useMutation({
     mutationKey: ["updateItem", id],
     mutationFn: async (newItem: Iitem) => {
-      const response = await axiosClient.put(`/item/${id}`, newItem, getAuthorHeader());
+      const response = await axiosClient.put(`/items/${id}`, newItem, getAuthorHeader());
       return response.data;
     },
     // When success => alert and navigate to path "/items"
@@ -227,7 +230,7 @@ export const useDeleteItem = (id: string, setStatusError: (status: number | null
   return useMutation({
     mutationKey: ["deleteItem", id],
     mutationFn: async () => {
-      const response = await axiosClient.delete(`/item/${id}`, getAuthorHeader());
+      const response = await axiosClient.delete(`/items/${id}`, getAuthorHeader());
       return response.data;
     },
     // When success => alert and navigate to path "/items"
