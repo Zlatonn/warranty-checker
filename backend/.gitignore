@@ -1,0 +1,9 @@
+# depDependencies
+node_modules/
+
+# Database files
+database.db
+.DS_Store
+
+# Environment Variables
+.env

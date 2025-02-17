@@ -1,1 +1,11 @@
+# Dependencies
 node_modules
+
+# Database files
+database.db
+
+# Environment Variables
+.env
+
+# Git version control
+.gitignore
