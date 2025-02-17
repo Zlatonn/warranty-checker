@@ -53,11 +53,11 @@ const Login = () => {
   const [statusError, setStatusError] = useState<number | null>(null);
 
   // Fetch register user using userRegister
-  const { mutate: loingUser } = useLogin(setStatusError);
+  const { mutate: logInUser, isPending: logingInUser } = useLogin(setStatusError);
 
   // Function handle submit
   const onSubmit: SubmitHandler<Iform> = (data) => {
-    loingUser(data);
+    logInUser(data);
   };
 
   // Return JSX with error condition
@@ -125,7 +125,7 @@ const Login = () => {
               </span>
               {errors.password && <p className="w-fit mt-1 text-red-500 text-xs">{errors.password.message}</p>}
             </div>
-            <button type="submit" className="w-full my-3 bg-green-600 text-white py-3 rounded-lg hover:opacity-80">
+            <button type="submit" disabled={logingInUser} className="w-full my-3 bg-green-600 text-white py-3 rounded-lg hover:opacity-80">
               Sign in
             </button>
           </div>
