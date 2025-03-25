@@ -2,8 +2,8 @@ import { Link, useNavigate } from "react-router-dom";
 import { useState } from "react";
 import useSearchQuery from "../../stores/useSearchQuery";
 
-import searchIcon from "../../assets/search_icon.png";
-import userIcon from "../../assets/user-regular.svg";
+import searchIcon from "/images/search_icon.webp";
+import userIcon from "/images/user-regular.webp";
 
 const NavBar = () => {
   // useNavigate for manual channge route

@@ -9,9 +9,9 @@ import Error500 from "../components/error/Error500";
 import ErrorNetwork from "../components/error/ErrorNetwork";
 import ErrorUnexpected from "../components/error/ErrorUnexpected";
 
-import bgLogin from "../assets/bg_login.jpg";
-import eyeIcon from "../assets/eye-solid.svg";
-import eyeSlashIcon from "../assets/eye-slash-solid.svg";
+import bgLogin from "/images/bg_login.webp";
+import eyeIcon from "/images/eye-solid.webp";
+import eyeSlashIcon from "/images/eye-slash-solid.webp";
 
 //Define type of form
 interface Iform {
