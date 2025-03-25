@@ -1,9 +1,9 @@
 import { Link } from "react-router-dom";
 
-import bgHome from "../assets/bg_home.png";
-import imgWarranty from "../assets/warranty.jpg";
-import imgCustomer from "../assets/customer.jpg";
-import imgUser from "../assets/user.jpg";
+import bgHome from "/images/bg_home.webp";
+import imgWarranty from "/images/warranty.webp";
+import imgCustomer from "/images/customer.webp";
+import imgUser from "/images/user.webp";
 
 const Home = () => {
   return (

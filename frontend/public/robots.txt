@@ -1,0 +1,3 @@
+User-Agent: *
+Allow: /
+Sitemap: https://warranty-checker.netlify.app/sitemap.xml

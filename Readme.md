@@ -63,33 +63,33 @@ npm run dev
 
 - Home Page
 
-  ![Home](./frontend/src/assets/home%20page.png)
-  ![Our Feature](./frontend/src/assets/our%20feature.png)
-  ![About](./frontend/src/assets/about.png)
+  ![Home](./frontend/src/assets/home%20page.webp)
+  ![Our Feature](./frontend/src/assets/our%20feature.webp)
+  ![About](./frontend/src/assets/about.webp)
 
 - Login Page
 
-  ![Login Page](./frontend/src/assets/login%20page.png)
+  ![Login Page](./frontend/src/assets/login%20page.webp)
   email: warranty@mail.com
   password: Passw0rd
 
 - Items Page
 
-  ![Items Page](./frontend/src/assets/items%20page.png)
+  ![Items Page](./frontend/src/assets/items%20page.webp)
 
 - Create Page
 
-  ![Create Page](./frontend/src/assets/create%20page.png)
+  ![Create Page](./frontend/src/assets/create%20page.webp)
 
 - Edit Page
 
-  ![Edit Page](./frontend/src/assets/edit%20page.png)
+  ![Edit Page](./frontend/src/assets/edit%20page.webp)
 
 - Filter Page
 
-  ![Warranty Filter](./frontend/src/assets/warranty%20filter.png)
-  ![Near Expire Filter](./frontend/src/assets/near%20expire%20filter.png)
-  ![Expired Filter](./frontend/src/assets/expired%20filter.png)
+  ![Warranty Filter](./frontend/src/assets/warranty%20filter.webp)
+  ![Near Expire Filter](./frontend/src/assets/near%20expire%20filter.webp)
+  ![Expired Filter](./frontend/src/assets/expired%20filter.webp)
 
 ## 🌐 Live Demo
 
