@@ -3,6 +3,24 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <!-- icon -->
+    <link rel="icon" href="/logo.ico" />
+
+    <!-- Preload the LCP image with a high fetchpriority -->
+    <link rel="preload" fetchpriority="high" as="image" href="/images/bg_home.webp" type="image/webp" />
+    <link rel="preload" fetchpriority="high" as="image" href="/images/bg_login.webp" type="image/webp" />
+
+    <!-- Open Graph Tags -->
+    <meta name="description" content="Warranty Expiry Checker - Track and manage your product warranties easily." />
+    <meta name="keywords" content="warranty tracker, warranty expiry, product management, React, Node.js, SQLite, web app" />
+    <meta name="author" content="Zlatonn" />
+    <meta property="og:title" content="Warranty Expiry Checker" />
+    <meta property="og:description" content="A web app for tracking and managing product warranties efficiently." />
+    <meta property="og:image" content="/images/warranty_checker_preview.webp" />
+    <meta property="og:url" content="https://warranty-checker.netlify.app/" />
+    <meta property="og:type" content="website" />
+
+    <!-- Web Title -->
     <title>Warranty Checker</title>
   </head>
   <body>
