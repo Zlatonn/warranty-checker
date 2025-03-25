@@ -30,10 +30,15 @@ Ensure you have the following installed:
 - Node.js (>=16)
 - Docker (optional, for containerized deployment)
 
+### Clone Project
+
+```bash
+git clone https://github.com/Zlatonn/warranty-expiry-checker.git
+```
+
 ### Backend Setup
 
 ```bash
-git clone https://github.com/your-repo/warranty-expiry-tracker.git
 cd backend
 npm install
 npm run dev
@@ -101,6 +106,8 @@ This project is licensed under the MIT License.
 
 ## 📈 Future Enhancements
 
-- User role management
 - Notification system for expiring warranties
-- Export data as CSV
+- Enhance scalability with separate register and item data for each user.
+- Admin system for managing user data
+- Security & Privacy
+- Enhance UI/UX
