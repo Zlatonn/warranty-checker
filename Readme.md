@@ -1,4 +1,4 @@
-# ✅ Warranty Expiry Tracker
+# ✅ Warranty Checker
 
 ## 📋 Overview
 
